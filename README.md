@@ -233,6 +233,7 @@ istio1.7
       http://$INGRESS_HOST:$INGRESS_PORT/productpage
       
       【可以打开首页就成功了～】
+      ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/bookinfo.png)
       可以注意到刷新几次应用的页面，就会看到 productpage 页面中会随机展示 reviews 服务的不同版本的效果（红色、黑色的星形或者没有显示）。reviews 服务出现这种情况是因为我们还没有使用 Istio 来控制版本的路由。
      
    10、应用默认目标规则（未开启TLS）
