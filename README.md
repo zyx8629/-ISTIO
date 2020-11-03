@@ -1,13 +1,12 @@
 # -ISTIO
 
-环境：
+# 环境：
 
 Kubernetes1.18
 
-istio1.7
+centos7
 
-
-一、安装Istio
+# 一、安装Istio
 
    1、官网下载安装包并解压
    
@@ -51,7 +50,7 @@ istio1.7
        istio-ingressgateway-bd4fdbd5f-55p4z   1/1     Running   0          98m
        istiod-74844f57b-mmxz2                 1/1     Running   0          100m
 
-二、Bookinfo应用
+# 二、Bookinfo应用
 
    1、进入 istio 安装目录，注入 sidecar，命名空间打标签
    
@@ -89,7 +88,7 @@ istio1.7
    
    5、为 ingfess 配置IP和端口号，利用端口，实现外部访问
          
-       kubectl apply -f samples/bookinfo/networking/bookinfo-gateway.yaml
+       kubectl apply -f samples/bookinfo/networking/bookinfo-gateway.yaml 【真是执行了个寂寞】
        kubectl get gateway
   
    6、查看 INGRESS_HOST 和 INGRESS_PORT 变量，暴露 GATEWAY_URL
@@ -102,7 +101,7 @@ istio1.7
        istio-ingressgateway   LoadBalancer   10.96.231.38   <pending>     15021:31880/TCP,80:31966/TCP,443:32273/TCP,31400:31340/TCP,15443:30333/TCP   16h
        【果然还是 LoadBalancer 状态的问题】
        
-   7、由于这个版本的istio不知道怎么永久修改 ingressgateway的 type ，只能先默认LB状态。因此，查看开发手册https://istio.io/latest/zh/docs/tasks/traffic-management/ingress/ingress-control/ ，需先使用外部load balancer确定 ingress ip 和 port的方法
+   7、由于这个版本的istio不知道怎么永久修改 ingressgateway的 type ，只能先默认 LB 状态。因此，查看开发手册https://istio.io/latest/zh/docs/tasks/traffic-management/ingress/ingress-control/ ，需先使用外部load balancer确定 ingress ip 和 port的方法
        
        export INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}')
        export SECURE_INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="https")].nodePort}')
@@ -243,9 +242,54 @@ istio1.7
         kubectl apply -f samples/bookinfo/networking/destination-rule-all.yaml
         kubectl get destinationrules -o yaml
         
-三、利用Jaeger对Bookinfo进行分布式追踪
+# 三、利用Jaeger对Bookinfo进行分布式追踪
 
-
+   1、给istio安装jaeger
+   
+   a.官网下载安装YAML文件
+   
+      mkdir jaeger
+      cd jaeger
+      wget https://raw.githubusercontent.com/jaegertracing/jaeger-kubernetes/master/all-in-one/jaeger-all-in-one-template.yml
       
+   b.在istio-system命名空间上安装jaeger
+   
+      kubectl create -n istio-system -f jaeger-all-in-one-template.yml
+   
+   c.查看一下 istio-system 命名空间下的服务
+      
+     【出现了jaeger的三个服务】
+     jaeger-agent           ClusterIP      None             <none>        5775/UDP,6831/UDP,6832/UDP,5778/TCP                                          2m52s
+     jaeger-collector       ClusterIP      10.104.142.103   <none>        14267/TCP,14268/TCP,9411/TCP                                                 2m52s
+     jaeger-query           LoadBalancer   10.97.140.81     <pending>     80:31455/TCP                                                                 2m52s
+   
+   2、访问仪jaeger控制面板
+   
+    kubectl port-forward -n istio-system $(kubectl get pod -n istio-system -l app=jaeger -o jsonpath='{.items[0].metadata.name}') 16686:16686 &
+    
+    ！！！报错！！！！
+    error: error executing jsonpath "{.items[0].metadata.name}": Error executing template: array index out of bounds: index 0, length 0. Printing more information for debugging the template:
+	template was:
+		{.items[0].metadata.name}
+	object given to jsonpath engine was:
+		map[string]interface {}{"apiVersion":"v1", "items":[]interface {}{}, "kind":"List", "metadata":map[string]interface {}{"resourceVersion":"", "selfLink":""}}
+      error: TYPE/NAME and list of ports are required for port-forward
+      See 'kubectl port-forward -h' for help and examples
+      
+   查看kubectl源码
+ 
+      func (o *PortForwardOptions) Complete(f cmdutil.Factory, cmd *cobra.Command, args []string) error {
+         var err error
+         if len(args) < 2 {   【发现是参数小于2个报错】
+            return cmdutil.UsageErrorf(cmd, "TYPE/NAME and list of ports are required for port-forward")
+         }
+         
+   所以这官网命令行似乎有点问题，我修改了jaeger安装YAML文件中的参数，让 jeager-query 是 NodePort 的状态
+   
+      jaeger-query           NodePort       10.97.140.81     <none>        80:31455/TCP                                                                 60m
+   
+   但是浏览器访问 http://localhost:31455 并无界面出现
+   
+
        
        
