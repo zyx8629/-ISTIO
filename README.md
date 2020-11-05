@@ -343,7 +343,7 @@ centos7
 
 访问tracing端口号 http://192.168.3.11:30111/jaeger/search 就可以了～
 
-![image]https://github.com/zyx8629/-ISTIO/blob/main/images/jaeger.png
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/jaeger.png)
 
 3、利用 jeager dashboard 监测 bookinfo
 
