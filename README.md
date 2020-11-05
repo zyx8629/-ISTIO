@@ -290,6 +290,66 @@ centos7
    
    但是浏览器访问 http://localhost:31455 并无界面出现
    
+   得知可以直接修改tracing服务的类型，但查找istio中全部服务没发现tracing的痕迹
+   
+   	kubectl get all -n istio-system
+	NAME                                       READY   STATUS    RESTARTS   AGE
+	pod/istio-egressgateway-8d84f88b8-mp7sp    1/1     Running   1          2d2h
+	pod/istio-ingressgateway-bd4fdbd5f-55p4z   1/1     Running   2          2d16h
+	pod/istiod-74844f57b-mmxz2                 1/1     Running   2          2d16h
+
+	NAME                           TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                                      AGE
+	service/istio-egressgateway    ClusterIP      10.105.145.146   <none>        80/TCP,443/TCP,15443/TCP                                                     2d16h
+	service/istio-ingressgateway   LoadBalancer   10.96.231.38     <pending>     15021:31880/TCP,80:31966/TCP,443:32273/TCP,31400:31340/TCP,15443:30333/TCP   2d16h
+	service/istiod                 ClusterIP      10.100.251.114   <none>        15010/TCP,15012/TCP,443/TCP,15014/TCP,853/TCP                                2d16h
+	service/jaeger-agent           ClusterIP      None             <none>        5775/UDP,6831/UDP,6832/UDP,5778/TCP                                          38h
+	service/jaeger-collector       ClusterIP      10.101.142.126   <none>        14267/TCP,14268/TCP,9411/TCP                                                 38h
+	service/jaeger-query           LoadBalancer   10.111.135.253   <pending>     80:30860/TCP                                                                 38h
+	service/zipkin                 ClusterIP      None             <none>        9411/TCP                                                                     38h
+
+	NAME                                   READY   UP-TO-DATE   AVAILABLE   AGE
+	deployment.apps/istio-egressgateway    1/1     1            1           2d16h
+	deployment.apps/istio-ingressgateway   1/1     1            1           2d16h
+	deployment.apps/istiod                 1/1     1            1           2d16h
+
+	NAME                                             DESIRED   CURRENT   READY   AGE
+	replicaset.apps/istio-egressgateway-8d84f88b8    1         1         1       2d16h
+	replicaset.apps/istio-ingressgateway-bd4fdbd5f   1         1         1       2d16h
+	replicaset.apps/istiod-74844f57b                 1         1         1       2d16h
+
+现在想一定是有什么别的问题，查看了英语版本的开发手册，恍然大悟，https://istio.io/latest/docs/tasks/observability/distributed-tracing/jaeger/ ，为什么和中文版本不一样！！！删掉了刚才安装的jaeger服务，重新来过
+
+	cd /root/istio/istio-1.7.4/samples/addons
+	kubectl apply -f jaeger.yaml
+	
+再次查看服务，出现了tracing
+	
+	kubectl get svc -n istio-system
+	NAME                   TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                                      AGE
+	istio-egressgateway    ClusterIP      10.105.145.146   <none>        80/TCP,443/TCP,15443/TCP                                                     2d17h
+	istio-ingressgateway   LoadBalancer   10.96.231.38     <pending>     15021:31880/TCP,80:31966/TCP,443:32273/TCP,31400:31340/TCP,15443:30333/TCP   2d17h
+	istiod                 ClusterIP      10.100.251.114   <none>        15010/TCP,15012/TCP,443/TCP,15014/TCP,853/TCP                                2d17h
+	jaeger-agent           ClusterIP      None             <none>        5775/UDP,6831/UDP,6832/UDP,5778/TCP                                          39h
+	jaeger-collector       ClusterIP      10.101.142.126   <none>        14267/TCP,14268/TCP,9411/TCP                                                 39h
+	jaeger-query           LoadBalancer   10.111.135.253   <pending>     80:30860/TCP                                                                 39h
+	tracing                ClusterIP      10.97.28.187     <none>        80/TCP                                                                       67s
+	zipkin                 ClusterIP      None             <none>        9411/TCP                                                                     39h
+
+然后修改一下他的TYPE
+	
+	kubectl get svc -n istio-system
+	NAME                   TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                                      AGE
+	tracing                NodePort       10.99.56.112     <none>        80:30111/TCP                                                                 6s
+
+访问tracing端口号 http://192.168.3.11:30111/jaeger/search 就可以了～
+
+![image]https://github.com/zyx8629/-ISTIO/blob/main/images/jaeger.png
+
+3、利用 jeager dashboard 监测 bookinfo
+
+
+
+
 
        
        
