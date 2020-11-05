@@ -347,10 +347,27 @@ centos7
 
 3、利用 jeager dashboard 监测 bookinfo
 
-不是，什么情况
+不是，什么情况😭谁动了我的网！！
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/404.png)
 
+删除了服务，又执行了一下～
+
+简单执行了一下访问主页的追踪
+
+4、尝试了解每个图和参数都是什么意思
+
+a.监控板可以看见基本信息
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/baseinfo.png)
+
+b.总用时17.19s；该过程一共启用五个服务；产生6词调用(其中小于1s的调用不被下面结构图记录)；8个span
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/timeline%E8%A7%86%E5%9B%BE.png)
+
+c.这里不知道为啥istio-ingressgateway的服务没显示
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/trace%20graph.png)
 
 
 
