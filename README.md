@@ -347,6 +347,11 @@ centos7
 
 3、利用 jeager dashboard 监测 bookinfo
 
+不是，什么情况
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/404.png)
+
+
 
 
 
