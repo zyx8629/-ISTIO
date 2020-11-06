@@ -262,6 +262,13 @@ centos7
      jaeger-agent           ClusterIP      None             <none>        5775/UDP,6831/UDP,6832/UDP,5778/TCP                                          2m52s
      jaeger-collector       ClusterIP      10.104.142.103   <none>        14267/TCP,14268/TCP,9411/TCP                                                 2m52s
      jaeger-query           LoadBalancer   10.97.140.81     <pending>     80:31455/TCP                                                                 2m52s
+     
+ 【注】service type 目前有两种，如果使用 gce 的 kubernetes，可以直接使用 LoadBalancer 类型，gce 会自动帮忙生成一个外部ip，做负载均衡；
+ 
+ 如果不是在 gce 平台，可以选择使用NodePort的类型，这样会在 node 里面添加一个对外的端口号，可以通过 nodeIP:nodePORT 来访问。
+ 
+ 所以目前我的服务器并非支持外部负载均衡器的，因此，不能通过LB状态下的端口直接访问。
+
    
    2、访问仪jaeger控制面板
    
@@ -368,6 +375,11 @@ b.总用时17.19s；该过程一共启用五个服务；产生6词调用(其中�
 c.这里不知道为啥istio-ingressgateway的服务没显示
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/trace%20graph.png)
+
+【知道了，因为 ingressgateway 并不是服务，是一种智能路由】
+
+#四、通过sidecar模式注入pod
+
 
 
 
