@@ -378,9 +378,87 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 【知道了，因为 ingressgateway 并不是服务，是一种智能路由】
 
-#四、通过sidecar模式注入pod
+#四、将sidecar通过手动方式注入pod（bookinfo通过自动方式注入，所以尝试一下手动注入），利用命令istioctl kube-inject，为sleep实例注入sidecar
+
+   1、执行 kube-inject ，并启动 sleep
+   
+   	istioctl kube-inject -f samples/sleep/sleep.yaml | kubectl apply -f -
+
+   2、 手动注入
+   
+   	kubectl -n istio-system get configmap istio-sidecar-injector -o=jsonpath='{.data.config}' > inject-config.yaml
+	kubectl -n istio-system get configmap istio-sidecar-injector -o=jsonpath='{.data.values}' > inject-values.yaml
+ 	kubectl -n istio-system get configmap istio -o=jsonpath='{.data.mesh}' > mesh-config.yaml
+	
+   3、执行
+   
+   	istioctl kube-inject \
+	>     --injectConfigFile inject-config.yaml \
+	>     --meshConfigFile mesh-config.yaml \
+	>     --valuesFile inject-values.yaml \
+	>     --filename samples/sleep/sleep.yaml \
+	>     | kubectl apply -f -
+
+   4、检查 pod 状态
+   
+   	 kubectl get pod  -l app=sleep
+	 【提示】
+	 NAME                     READY   STATUS             RESTARTS   AGE
+	 sleep-7cf44d4ddd-6gtst   1/2     CrashLoopBackOff   9          23m
+	
+	CrashLoopBackOff ！！！报错！！！ 大事不妙 🤔
+	
+	【检查 1】kubectl describe pod  -l app=sleep （这个 pod 中有两个 containers）
+	
+	 问题出现在 ->istio-proxy<-
+	    Container ID:  docker://7aaf51cf8aa0a0ba3cb341ce403f74a8257bbf3d2f4fb9e0f757990bee4a241c
+	    Image:         docker.io/istio/proxyv2:1.7.4
+	    Image ID:      docker-pullable://istio/proxyv2@sha256:17faf9ddc1254ad98cc70fb11fa74043ce2705f3272eace3fa7011a29576c8f1
+	    Port:          15090/TCP
+	    Host Port:     0/TCP
+	    Args:
+	      proxy
+	      sidecar
+	      --domain
+	      $(POD_NAMESPACE).svc.cluster.local
+	      --serviceCluster
+	      sleep.$(POD_NAMESPACE)
+	      --proxyLogLevel=warning
+	      --proxyComponentLogLevel=misc:error
+	      --trust-domain=cluster.local
+	      --concurrency
+	      2
+	    State:          Waiting
+	      Reason:       CrashLoopBackOff
+	    Last State:     Terminated
+	      Reason:       Error
+	      Exit Code:    255
+	      Started:      Sat, 07 Nov 2020 17:37:24 +0800
+	      Finished:     Sat, 07 Nov 2020 17:37:25 +0800
+	    Ready:          False
+	 
+	 【检查 2】kubectl logs sleep-7cf44d4ddd-6gtst -c istio-proxy
+	 
+	 Error: invalid prometheus scrape configuration: application port is the same as agent port, which may lead to a recursive loop. Ensure pod does not have prometheus.io/port=15020 label, or that injection is not happening multiple times
+	 
+	 参考： https://github.com/istio/istio/issues/27675 
+	 
+	 解决：在执行bookinfo实例的时候，把默认命名空间修改为自动注入 sidecar 状态，导致了二次注入，删除sleep服务，直接apply就行了
+	 
+	kubectl get po
+	NAME                              READY   STATUS    RESTARTS   AGE
+	details-v1-558b8b4b76-6jrx4       2/2     Running   18         4d9h
+	productpage-v1-6987489c74-q2t4h   2/2     Running   18         4d9h
+	ratings-v1-7dc98c7588-k29qh       2/2     Running   18         4d9h
+	reviews-v1-7f99cc4496-kjqk9       2/2     Running   18         4d9h
+	reviews-v2-7d79d5bd5d-nk8rw       2/2     Running   18         4d9h
+	reviews-v3-7dbcdcbc56-wttk8       2/2     Running   18         4d9h
+	sleep-8f795f47d-nb42k             2/2     Running   0          58s
 
 
+	 
+
+	
 
 
 
