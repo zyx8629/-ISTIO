@@ -459,8 +459,51 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/istio%E7%BB%93%E6%9E%84%E5%9B%BE.png)
 
+（1）自动注入
+	
+	「在上一个学习过程中深有体会」
+	它的原理是：kube-apiserver 调用管理面组建的 Sidecar-Injector 服务，自动修改应用程序的描述信息并注入 Sidecar。
+	由此也可知，pod中的 Sidecar 和业务容器是同时建立的。
 
+（2）流量拦截
 
+	iptables规则，拦截业务容器的进、出流量到Sidecar 中。
+
+（3）服务发现【Sidecar->Pilot->service list】
+
+	服务发起者的Envoy(Sidecar) 去找 Pilot要目标服务的实例列表。
+	
+（4）负载均衡【Sidecar->Pilot->service IP】
+	
+	服务发起者的Envoy(Sidecar) 根据负载均衡策略选择服务实例。
+	
+（5）流量治理【Pilot】
+
+	Envoy 找 Pilot要流量规则，在拦截到的入、出流量中执行。
+
+（6）访问安全🔐【Pilot下发安全配置，Citadel维护证书和密钥】
+
+	双向认证和通道加密
+	
+（7）服务遥测【Mixer】  ps：我怎么觉得Mixer这么多余呢，直接传给Galley不好吗🙈
+
+	通信双方向Mixer 上报访问数据，然后Mixer 再发给监控后端。
+
+（8）策略执行【Mixer】
+
+	通过Mixer 连接后端服务来控制服务间的访问。
+
+（9）外部访问
+
+	网格入口处有个网关。
+	
+# 六、istio 和 jaeger间交互的实现
+
+【。。。】
+
+# 七、istio 的流量管理
+
+【。。。】
 
 	 
 
