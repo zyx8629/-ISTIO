@@ -454,6 +454,12 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 	reviews-v2-7d79d5bd5d-nk8rw       2/2     Running   18         4d9h
 	reviews-v3-7dbcdcbc56-wttk8       2/2     Running   18         4d9h
 	sleep-8f795f47d-nb42k             2/2     Running   0          58s
+	
+# 五、学习一下 ISTIO 的原理
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/istio%E7%BB%93%E6%9E%84%E5%9B%BE.png)
+
+
 
 
 	 
