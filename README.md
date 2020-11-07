@@ -378,7 +378,7 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 【知道了，因为 ingressgateway 并不是服务，是一种智能路由】
 
-#四、将sidecar通过手动方式注入pod（bookinfo通过自动方式注入，所以尝试一下手动注入），利用命令istioctl kube-inject，为sleep实例注入sidecar
+# 四、将sidecar 注入pod
 
    1、执行 kube-inject ，并启动 sleep
    
