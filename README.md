@@ -500,9 +500,10 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 	网格入口处有个网关。
 	
-# 六、istio 和 jaeger 间交互的实现
+# 六、istio 和 jaeger 间交互的实现【调用链跟踪】
 
-【。。。】
+
+
 
 # 七、istio 的流量管理【特指数据面的流量】
 
@@ -692,6 +693,7 @@ Step 4:登陆client 端，查看成果
 	此时如果修改client服务，不再进行注入的话，再次访问，还是执行轮询的，因此证明协议或规则的实现也只能在同一个网格中执行。
 
 🤓【小结】
+
 💁🏻 virtual service = hosts field + routing rules
 
 💁🏻 hosts field 是在k8s集群内，除了pod之外，可寻址的目标。一般该值可以是短域名、全域名、网关名（ingress）、‘*’
