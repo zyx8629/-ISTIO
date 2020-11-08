@@ -464,10 +464,13 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 	「在上一个学习过程中深有体会」
 	它的原理是：kube-apiserver 调用管理面组建的 Sidecar-Injector 服务，自动修改应用程序的描述信息并注入 Sidecar。
 	由此也可知，pod中的 Sidecar 和业务容器是同时建立的。
+	一旦k8s资源被注入Sidecar，就生成一个服务网格。
+	
 
-（2）流量拦截
+（2）流量拦截【Enovy】
 
 	iptables规则，拦截业务容器的进、出流量到Sidecar 中。
+	ps:像个经纪人（Enovy）一样，按照经纪人委员会（控制面）的要求，安排艺人（服务）的全部事宜、办事规则😎
 
 （3）服务发现【Sidecar->Pilot->service list】
 
@@ -501,9 +504,15 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 【。。。】
 
-# 七、istio 的流量管理
+# 七、istio 的流量管理【特指数据面的流量】
 
-【。。。】
+流量管理的本质是采用合适的策略控制流量的方向和多少。
+
+网格发送和接受度额所有流量都通过Envoy进行代理。过程如下：
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg)
+
+
 
 	 
 
