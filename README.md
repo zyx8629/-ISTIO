@@ -528,9 +528,9 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 # 七、istio 的流量管理【特指数据面的流量】
 
-流量管理的本质是采用合适的策略控制流量的方向和多少。
+👻 流量管理的本质是采用合适的策略控制流量的方向和多少。
 
-网格发送和接受度额所有流量都通过Envoy进行代理。过程如下：
+🎃 网格发送和接受度额所有流量都通过Envoy进行代理。过程如下：
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg)
 
