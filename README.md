@@ -518,8 +518,117 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86proj.jpg)
 
+Step 1:准备需要的YAML文件
 
-	
+	 touch is-client.yaml
+	 touch is-deployment.yaml
+	 touch is-vs.yaml
+	 
+	 a、 is-client.yaml
+	 
+	  1 apiVersion: apps/v1
+	  2 kind: Deployment
+	  3 metadata:
+	  4   name: client
+	  5 spec:
+	  6   replicas: 1
+	  7   selector:
+	  8     matchLabels:
+	  9       app: client
+	 10   template:
+	 11     metadata:
+	 12       labels:
+	 13         app: client
+	 14     spec:
+	 15       containers:
+	 16       - name: busybox
+	 17         image: busybox
+	 18         imagePullPolicy: IfNotPresent
+	 19         command: ["/bin/sh","-c","sleep 3600"]
+	 
+         b、is-deployment.yaml
+	 
+ 	  1 apiVersion: apps/v1
+	  2 kind: Deployment
+	  3 metadata:
+	  4   name: httpd
+	  5   labels:
+	  6     server: httpd
+	  7     app: web
+	  8 spec:
+	  9   replicas: 1
+	 10   selector:
+	 11     matchLabels:
+	 12       server: httpd
+	 13       app: web
+	 14   template:
+	 15     metadata:
+	 16       name: httpd
+	 17       labels:
+	 18         server: httpd
+	 19         app: web
+	 20     spec:
+	 21       containers:
+	 22       - name: busybox
+	 23         image: busybox
+	 24         imagePullPolicy: IfNotPresent
+	 25         command: ["/bin/sh","-c","echo 'hello httpd' > /var/www/index.html; httpd -f -p 8080 -h /var/www" ]
+	 26 ---
+	 27 apiVersion: apps/v1
+	 28 kind: Deployment
+	 29 metadata:
+	 30   name: tomcat
+	 31   labels:
+	 32     server: tomcat
+	 33     app: web
+	 34 spec:
+	 35   replicas: 1
+	 36   selector:
+	 37     matchLabels:
+	 38       server: tomcat
+	 39       app: web
+	 40   template:
+	 41     metadata:
+	 42       name: tomcat
+	 43       labels:
+	 44         server: tomcat
+	 45         app: web
+	 46     spec:
+	 47       containers:
+	 48       - name: tomcat
+	 49         image: docker.io/kubeguide/tomcat-app:v1
+	 50         imagePullPolicy: IfNotPresent
+	 51         command: ["/bin/sh","-c","echo 'hello tomcat' > /var/www/index.html; httpd -f -p 8080 -h /var/www" ]
+	 
+         c、is-vs.yaml
+	 
+	  1 apiVersion: v1
+	  2 kind: Service
+	  3 metadata:
+	  4   name: tomcat-svc
+	  5 spec:
+	  6   selector:
+	  7     app: tomcat
+	  8   ports:
+	  9   - name: http
+	 10     port: 8080
+	 11     targetPort: 8080
+	 12     protocol: TCP
+	 13 ---
+	 14 apiVersion: v1
+	 15 kind: Service
+	 16 metadata:
+	 17   name: httpd-svc
+	 18 spec:
+	 19   selector:
+	 20     app: httpd
+	 21   ports:
+	 22   - name: http
+	 23     port: 8080
+	 24     targetPort: 8080
+	 25     protocol: TCP
+
+
 
 
 
