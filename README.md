@@ -500,7 +500,7 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 	网格入口处有个网关。
 	
-# 六、istio 和 jaeger间交互的实现
+# 六、istio 和 jaeger 间交互的实现
 
 【。。。】
 
@@ -689,5 +689,14 @@ Step 4:登陆client 端，查看成果
 	
 	【发现不再执行轮询策略，Tomcat 服务启动的概率更大了】
 	
-	此时如果修改client服务，不再进行注入的话，再次访问，还是执行轮询的，因此证明协议或规则的实现也只能在同一个网格中执行
+	此时如果修改client服务，不再进行注入的话，再次访问，还是执行轮询的，因此证明协议或规则的实现也只能在同一个网格中执行。
+
+🤓【小结】
+💁🏻 virtual service = hosts field + routing rules
+
+💁🏻 hosts field 是在k8s集群内，除了pod之外，可寻址的目标。一般该值可以是短域名、全域名、网关名（ingress）、‘*’
+
+💁🏻 routing rules 是可支持http、TCP的，规则可组合；一般由match（匹配条件）和destination（目的地）组成；match还存在优先级，写在前面的高；规则组合状态下也是需要同时满足要求才能进入目的地。具体还很多参考：https://istio.io/latest/docs/reference/config/networking/virtual-service/
+
+💁🏻 如果在集群外想访问集群中资源的时候，需要有Ingress
 	
