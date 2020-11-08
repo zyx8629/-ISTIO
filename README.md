@@ -512,9 +512,10 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg)
 
+【简单做一次流量管理实验】
 
+场景描述：用户可以访问 web service，现在有两种版本的 web service （如 httpd 和 Tomcat），想控制80%用户访问前者，20%访问后者。
 
-	 
 
 	
 
