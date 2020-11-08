@@ -514,7 +514,7 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 【简单做一次流量管理实验】
 
-场景描述：用户可以访问 web service，现在有两种版本的 web service （如 httpd 和 Tomcat），想控制80%用户访问前者，20%访问后者。大概实现流程如下：
+场景描述：用户可以访问 web service，现在有两种版本的 web service （如 Tomcat 和 httpd），想控制80%用户访问前者，20%访问后者。大概实现流程如下：
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86proj.jpg)
 
@@ -598,7 +598,6 @@ Step 1:准备需要的YAML文件
 	 48       - name: tomcat
 	 49         image: docker.io/kubeguide/tomcat-app:v1
 	 50         imagePullPolicy: IfNotPresent
-	 51         command: ["/bin/sh","-c","echo 'hello tomcat' > /var/www/index.html; httpd -f -p 8080 -h /var/www" ]
 	 
          c、is-vs.yaml
 	 
@@ -627,6 +626,68 @@ Step 1:准备需要的YAML文件
 	 23     port: 8080
 	 24     targetPort: 8080
 	 25     protocol: TCP
+	 26 ---
+	 27 apiVersion: v1
+	 28 kind: Service
+	 29 metadata:
+	 30   name: web-svc
+	 31 spec:
+	 32   selector:
+	 33      app: web
+	 34    ports:
+	 35    - name: http
+	 36      port: 8080
+	 37      targetPort: 8080
+	 38      protocol: TCP                     
+
+Step 2:apply 全部YAML 文件，并检查svc 和po 是否绑定
+
+	kubectl apply -f .
+	【如果tomcat起不来可能是镜像pull失败，可事先手动拉取到本地】
+	
+	kubectl get endpoints
+	【提示如下，okk】
+	httpd-svc     10.244.3.27:8080
+	tomcat-svc    10.244.1.179:8080 
+	web-svc       10.244.1.179:8080,10.244.3.27:8080 
+	
+	【目前状态是实现了两个服务的轮询，各50%】
+	
+Step 3:创建istio资源文件，is-virtualservice.yaml【是一种CRD资源】
+
+	touch is-virtualservice.yaml
+	vim is-virtualservice.yaml
+	
+	  1 apiVersion: networking.istio.io/v1alpha3
+	  2 kind: VirtualService
+	  3 metadata:
+	  4   name: web-svc-vs
+	  5 spec:
+	  6   hosts:
+	  7   - web-svc
+	  8   http:
+	  9   - route:
+	 10     - destination:
+	 11         host: tomcat-svc
+	 12       weight: 80
+	 13     - destination:
+	 14         host: httpd-svc
+	 15       weight: 20
+	 
+	kubectl apply -f is-virtualservice.yaml
+	kubectl get virtualservices.networking.istio.io  （并不是k8s资源，只应用于istio）
+	【提示】
+	NAME         GATEWAYS             HOSTS       AGE
+	bookinfo     [bookinfo-gateway]   [*]         5d10h
+	web-svc-vs                        [web-svc]   84s
+
+Step 4:登陆client 端，查看成果
+	
+	kubectl exec -it client-c565c4f7-spxnf -- sh
+	
+	wget -q -O - http://web-svc:8080
+	
+	【发现不再执行轮询策略，Tomcat 服务启动的概率更大了】
 
 
 
