@@ -733,3 +733,6 @@ Step 4: 登陆client 端，查看成果
 【实验 2】组合条件路由
 	
 修改【实验 1】中的路由条件如下所示：
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86pj2.jpg)
+
