@@ -662,7 +662,7 @@ Step 1: 准备需要的YAML文件
 	 37      targetPort: 8080
 	 38      protocol: TCP                     
 
-Step 2: apply 全部YAML 文件，并为他们注入sidecar，并检查svc 和po 是否绑定
+Step 2: apply 全部YAML 文件，并为他们注入sidecar，并检查svc 和port 是否关联
 
 	kubectl apply -f .
 	【如果tomcat起不来可能是镜像pull失败，可事先手动拉取到本地】
@@ -724,15 +724,63 @@ Step 4: 登陆client 端，查看成果
 
 💁🏻 virtual service = hosts field + routing rules
 
-💁🏻 hosts field 是在k8s集群内，除了pod之外，可寻址的目标。一般该值可以是短域名、全域名、网关名（ingress）、‘*’
+💁🏻 hosts field 是在k8s集群内，除了pod之外，可寻址的访问目标。一般该值可以是短域名、全域名、网关名（ingress）、‘*’
 
 💁🏻 routing rules 是可支持http、TCP的，也可执行组合路由；一般由match（匹配条件）和destination（目的地）组成；match还存在优先级，写在前面的高；执行组合路由的状态下也是需要同时满足要求才能进入目的地。具体还很多参考：https://istio.io/latest/docs/reference/config/networking/virtual-service/
 
 💁🏻 如果在集群外想访问集群中资源的时候，需要有Ingress
 
-【实验 2】组合条件路由
+【实验 2】条件路由
 	
 修改【实验 1】中的路由条件如下所示：
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86pj2.jpg)
+
+Step 1： 关闭【实验 1】中的VS服务，写一个新的带有如上图所示匹配条件的VS文件,并执行
+
+	a、is-virtualservice-with-condition.yaml
+	
+	  1 apiVersion: networking.istio.io/v1alpha3
+	  2 kind: VirtualService
+	  3 metadata:
+	  4   name: web-svc-vs
+	  5 spec:
+	  6   hosts:
+	  7   - web-svc
+	  8   http:
+	  9   - match:
+	 10     - headers:
+	 11         end-user:
+	 12           exact: zyx
+	 13     route:
+	 14     - destination:
+	 15         host: tomcat-svc
+	 16   - route:
+	 17     - destination:                        
+	
+	b、kubectl apply -f is-virtualservice-with-condition.yaml
+	
+Step 2: 先利用client 直接访问
+	
+	kubectl exec -it client-c565c4f7-spxnf -- sh
+	Defaulting container name to busybox.
+	Use 'kubectl describe pod/client-c565c4f7-spxnf -n default' to see all of the containers in this pod.
+	/ # wget -q -O - http://web-svc:8080
+	hello httpd
+	/ # wget -q -O - http://web-svc:8080
+	hello httpd
+	/ # wget -q -O - http://web-svc:8080
+	hello httpd
+	/ # wget -q -O - http://web-svc:8080
+	hello httpd
+	/ # wget -q -O - http://web-svc:8080
+	hello httpd
+	······
+	【发现只会访问 httpd 服务】
+	
+Step 3: 利用header 进行条件匹配，查看client 的访问
+
+	/ # wget -q -O - http://web-svc:8080 --header 'end-user: zyx'
+	
+	【发先可以访问 tomcat 服务】
 
