@@ -540,7 +540,7 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86proj.jpg)
 
-Step 1:准备需要的YAML文件
+Step 1: 准备需要的YAML文件
 
 	 touch is-client.yaml
 	 touch is-deployment.yaml
@@ -662,20 +662,27 @@ Step 1:准备需要的YAML文件
 	 37      targetPort: 8080
 	 38      protocol: TCP                     
 
-Step 2:apply 全部YAML 文件，并检查svc 和po 是否绑定
+Step 2: apply 全部YAML 文件，并为他们注入sidecar，并检查svc 和po 是否绑定
 
 	kubectl apply -f .
 	【如果tomcat起不来可能是镜像pull失败，可事先手动拉取到本地】
+	【由于bookinfo实验中，设置过默认命名空间自动注入sidecar，所以现在不需要注入了】
 	
+	【注】kubectl get po 查看是否注入成功
+	NAME                              READY   STATUS    RESTARTS   AGE
+	client-c565c4f7-spxnf             2/2     Running   7          16h
+	httpd-6488b7f8b-5hcp8             2/2     Running   2          14h
+	tomcat-75b9f6bf9b-gqkf6           2/2     Running   2          14h
+
 	kubectl get endpoints
-	【提示如下，okk】
+	【提示如下，就okk了】
 	httpd-svc     10.244.3.27:8080
 	tomcat-svc    10.244.1.179:8080 
 	web-svc       10.244.1.179:8080,10.244.3.27:8080 
 	
 	【目前状态是实现了两个服务的轮询，各50%】
 	
-Step 3:创建istio资源文件，is-virtualservice.yaml【是一种CRD资源】
+Step 3: 创建istio资源文件，is-virtualservice.yaml【是一种CRD资源】
 
 	touch is-virtualservice.yaml
 	vim is-virtualservice.yaml
@@ -703,7 +710,7 @@ Step 3:创建istio资源文件，is-virtualservice.yaml【是一种CRD资源】
 	bookinfo     [bookinfo-gateway]   [*]         5d10h
 	web-svc-vs                        [web-svc]   84s
 
-Step 4:登陆client 端，查看成果
+Step 4: 登陆client 端，查看成果
 	
 	kubectl exec -it client-c565c4f7-spxnf -- sh
 	
@@ -725,3 +732,4 @@ Step 4:登陆client 端，查看成果
 
 【实验 2】组合条件路由
 	
+修改【实验 1】中的路由条件如下所示：
