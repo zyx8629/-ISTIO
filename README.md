@@ -786,7 +786,9 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 
 # 八、istio非侵入流量治理
 
-# 8.1 流量治理的原理
+## 8.1 流量治理的原理
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E6%B2%BB%E7%90%86%E6%B5%81%E7%A8%8B.png)
 
 8.1.1 负载均衡
 
@@ -800,6 +802,33 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 
 8.1.6 外部接入服务治理
 
-# 8.2 Istio路由规则配置：VirtualService
+## 8.2 Istio路由规则配置：VirtualService
 
+## 8.3 Istio目标规则配置：DestinationRule
 
+	1.TrafficPolicy
+	2.LoadBalancerSettings  [考虑算法替换]
+	3.ConnectiobPoolSettings
+	4.OutlierDetection  [驱逐不健康实例]
+	5.PortTrafficPolicy [端口上的流量策略会覆盖全局]
+	6.subset [可规定连接数]
+	
+😈 典型应用：
+
+	定义subset 
+	服务熔断：如果对故障服务进行隔离，也可以有效进行负载优化
+	负载均衡配置：端口或者subset都可配置
+	TLS认证配置：双向认证
+
+##8.4 Istio服务网关配置：Gateway
+
+	Gateway 一般和 VirtualServics 配合使用，定以外部怎样访问。
+	
+😈 典型应用：
+	
+	1、将网格内部的HTTP 服务发布为HTTP 外部访问
+	2、将网格内的HTTPS 服务发布为HTTPS 外部访问
+	3、将网格内的HTTP 服务发布为HTTPS 外部访问
+	4、将网格内的HTTP 服务发布为双向HTTPS 外部访问（身份校验）
+	5、将网格内的HTTP服务发布为HTTPS外部访问和HTTPS内部访问
+	
