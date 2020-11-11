@@ -534,7 +534,7 @@ c.这里不知道为啥istio-ingressgateway的服务没显示
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E7%AE%A1%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg)
 
-【实验 1】 简单的流量管理
+## 【实验 1】 简单的流量管理
 
 场景描述：用户可以访问 web service，现在有两种版本的 web service （如 Tomcat 和 httpd），想控制80%用户访问前者，20%访问后者。大概实现流程如下：
 
@@ -730,7 +730,7 @@ Step 4: 登陆client 端，查看成果
 
 💁🏻 如果在集群外想访问集群中资源的时候，需要有Ingress
 
-【实验 2】条件路由
+## 【实验 2】条件路由
 	
 修改【实验 1】中的路由条件如下所示：
 
@@ -783,6 +783,16 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 	/ # wget -q -O - http://web-svc:8080 --header 'end-user: zyx'
 	
 	【发先可以访问 tomcat 服务】
+	
+## 【实验 3】动态管理条件路由
+
+
+
+
+
+
+{...loading}
+
 
 # 八、istio非侵入流量治理
 
@@ -831,4 +841,22 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 	3、将网格内的HTTP 服务发布为HTTPS 外部访问
 	4、将网格内的HTTP 服务发布为双向HTTPS 外部访问（身份校验）
 	5、将网格内的HTTP服务发布为HTTPS外部访问和HTTPS内部访问
+	
+# 九、微服务故障处理 🚔
+
+## 9.1 部署prometheus和grafana
+
+## 9.2 故障的注入「开源项目chaosblade」
+
+## 9.3 微服务监测、监测报警、报警后故障处理
+
+## 9.4 基于grafana里的alert功能实现动态报警
+
+
+
+
+
+# 十、istio数据持久化
+
+
 	
