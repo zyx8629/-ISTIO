@@ -857,7 +857,37 @@ step 1: 启动 istio中的 prometheus 和 grafana 服务
 	NAME                   TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                                      AGE
 	grafana                ClusterIP      10.103.81.71     <none>        3000/TCP                                                                     21s
 	prometheus             ClusterIP      10.109.211.201   <none>        9090/TCP                                                                     12m
+	
+	配置文件里修改 TYPE为 NodePort 重新执行apply
+	prometheus             NodePort       10.109.211.201   <none>        9090:30046/TCP      
+	grafana                NodePort       10.103.81.71     <none>        3000:30190/TCP    
+	
+	执行：	
+	istioctl dashboard prometheus
+	istioctl dashboard grafana 
+	
+	此时访问 http://192.168.3.11:30046/graph 和 http://192.168.3.11:30190/ 即可显示Dashboard
 
+Step 2: 利用 prometheus 进行查询
+	 
+prometheus存储的是时序数据，即按相同时序(相同名称和标签)，以时间维度存储连续的数据的集合。
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/P.png)
+
+其他查询：
+
+请求 productpage 服务的总次数：
+	
+	istio_requests_total{destination_service="productpage.default.svc.cluster.local"}
+	
+请求 reviews 服务 V3 版本的总次数：
+
+	istio_requests_total{destination_service="reviews.default.svc.cluster.local", destination_version="v3"}
+
+过去 5 分钟 productpage 服务所有实例的请求频次：
+
+	rate(istio_requests_total{destination_service=~"productpage.*", response_code="200"}[5m])
+	
 ## 9.2 故障的注入「开源项目chaosblade」
 
 ## 9.3 微服务监测、监测报警、报警后故障处理
