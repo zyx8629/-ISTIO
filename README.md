@@ -892,12 +892,11 @@ Step 3:利用Grafana 进行监测
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/G.png)
 
-## 9.2 故障的注入「开源项目chaosblade」
+## 9.2 使用「chaosblade」进行故障的注入
 
-## 9.3 微服务监测、监测报警、报警后故障处理
 
-## 9.4 基于grafana里的alert功能实现动态报警
 
+## 9.3 基于grafana里的alert功能实现动态报警
 
 
 
