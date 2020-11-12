@@ -786,7 +786,7 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 	
 ## 【实验 3】动态管理条件路由
 
-
+描述：实现金丝雀发布。
 
 
 
@@ -844,7 +844,19 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 	
 # 九、微服务故障处理 🚔
 
-## 9.1 部署prometheus和grafana
+## 9.1 部署prometheus 和 grafana，实现服务指标可视化。
+
+step 1: 启动 istio中的 prometheus 和 grafana 服务
+	
+	cd /root/istio/istio-1.7.4/samples/addons  【1.7版本的istio安装时默认不启动这两个服务，需要手动发布，安装文件在此目录下】
+	kubectl apply -f prometheus.yaml
+	kubectl apply -f grafana.yaml
+	
+	kubectl get svc -n istio-system
+	[提示]
+	NAME                   TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)                                                                      AGE
+	grafana                ClusterIP      10.103.81.71     <none>        3000/TCP                                                                     21s
+	prometheus             ClusterIP      10.109.211.201   <none>        9090/TCP                                                                     12m
 
 ## 9.2 故障的注入「开源项目chaosblade」
 
