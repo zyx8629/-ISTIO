@@ -894,7 +894,172 @@ Step 3:利用Grafana 进行监测
 
 ## 9.2 使用「chaosblade」进行故障的注入
 
+Chaosblade Operator 是混沌工程实验工具 ChaosBlade 下的一款面向云原生领域的混沌实验注入工具，可单独部署使用。通过定义 Kubernetes CRD 来管理混沌实验，每个实验都有非常明确的执行状态。工具具有部署简单、执行便捷、标准化实现、场景丰富等特点。将 ChaosBlade 混沌实验模型与 Kubernetes CRD 很好的结合在一起，可以实现基础资源、应用服务、容器等场景在 Kubernetes 平台上场景复用，方便了 Kubernetes 下资源场景的扩展，而且可通过 chaosblade cli 统一执行调用。
 
+Step 1: 下载 chaosblade-operator ，利用 helm v3 方式安装
+
+1、安装helm v3
+	
+	下载helm v3.0.2，地址https://get.helm.sh/helm-v3.0.2-linux-amd64.tar.gz。
+	tar zxvf helm-v3.0.2-linux-amd64.tar.gz
+	mv linux-amd64/helm /usr/local/bin/helm
+	helm version
+	
+2、安装chaosblade-operator
+		
+	wget https://chaosblade.oss-cn-hangzhou.aliyuncs.com/agent/github/0.8.0/chaosblade-operator-0.8.0-v3.tgz
+	helm install chaosblade-operator chaosblade-operator-0.8.0-v3.tgz --namespace kube-system
+	
+	kubectl get pod -l part-of=chaosblade -n kube-system
+	NAME                                  READY   STATUS    RESTARTS   AGE
+	chaosblade-operator-599d9684b-vkhtj   1/1     Running   0          9m53s
+
+3、编辑故障文件loss-node-network-by-names.yaml，设置 bookinfo首页访问造成 60% 丢包率，并执行
+
+	  1 apiVersion: chaosblade.io/v1alpha1
+	  2 kind: ChaosBlade
+	  3 metadata:
+	  4   name: loss-node-network-by-names
+	  5 spec:
+	  6   experiments:
+	  7   - scope: node
+	  8     target: network
+	  9     action: loss
+	 10     desc: "node network loss"
+	 11     matchers:
+	 12     - name: names
+	 13       value: ["cnu3.192.168.3.13"]
+	 14     - name: namespace
+	 15       value:
+	 16       - "default"
+	 17     - name: percent
+	 18       value: ["60"]
+	 19     - name: interface
+	 20       value: ["eth0"]
+	 21     - name: local-port
+	 22       value: ["31966"]
+	
+	查看执行情况 
+	
+	kubectl get blade loss-node-network-by-names -o json  
+	
+	【提示不成功。。。。】
+		{
+	    "apiVersion": "chaosblade.io/v1alpha1",
+	    "kind": "ChaosBlade",
+	    "metadata": {
+		"annotations": {
+		    "preSpec": "{\"experiments\":[{\"scope\":\"node\",\"target\":\"network\",\"action\":\"loss\",\"desc\":\"node network loss\",\"matchers\":[{\"name\":\"names\",\"value\":[\"192.168.3.13\"]},{\"name\":\"namespace\",\"value\":[\"default\"]},{\"name\":\"percent\",\"value\":[\"60\"]},{\"name\":\"interface\",\"value\":[\"eth0\"]},{\"name\":\"local-port\",\"value\":[\"31966\"]}]}]}"
+		},
+		"creationTimestamp": "2020-11-12T08:51:33Z",
+		"finalizers": [
+		    "finalizer.chaosblade.io"
+		],
+		"generation": 4,
+		"managedFields": [
+		    {
+			"apiVersion": "chaosblade.io/v1alpha1",
+			"fieldsType": "FieldsV1",
+			"fieldsV1": {
+			    "f:metadata": {
+				"f:annotations": {
+				    "f:preSpec": {}
+				},
+				"f:finalizers": {
+				    ".": {},
+				    "v:\"finalizer.chaosblade.io\"": {}
+				}
+			    },
+			    "f:status": {
+				".": {},
+				"f:expStatuses": {},
+				"f:phase": {}
+			    }
+			},
+			"manager": "chaosblade-operator",
+			"operation": "Update",
+			"time": "2020-11-12T10:19:43Z"
+		    },
+		    {
+			"apiVersion": "chaosblade.io/v1alpha1",
+			"fieldsType": "FieldsV1",
+			"fieldsV1": {
+			    "f:metadata": {
+				"f:annotations": {}
+			    },
+			    "f:spec": {
+				".": {},
+				"f:experiments": {}
+			    }
+			},
+			"manager": "kubectl-client-side-apply",
+			"operation": "Update",
+			"time": "2020-11-12T10:19:43Z"
+		    }
+		],
+		"name": "loss-node-network-by-names",
+		"resourceVersion": "1420877",
+		"selfLink": "/apis/chaosblade.io/v1alpha1/chaosblades/loss-node-network-by-names",
+		"uid": "455367df-ed88-4497-8d20-a7132ac96f51"
+	    },
+	    "spec": {
+		"experiments": [
+		    {
+			"action": "loss",
+			"desc": "node network loss",
+			"matchers": [
+			    {
+				"name": "names",
+				"value": [
+				    "cnu3.192.168.3.13"
+				]
+			    },
+			    {
+				"name": "namespace",
+				"value": [
+				    "default"
+				]
+			    },
+			    {
+				"name": "percent",
+				"value": [
+				    "60"
+				]
+			    },
+			    {
+				"name": "interface",
+				"value": [
+				    "eth0"
+				]
+			    },
+			    {
+				"name": "local-port",
+				"value": [
+				    "31966"
+				]
+			    }
+			],
+			"scope": "node",
+			"target": "network"
+		    }
+		]
+	    },
+	    "status": {
+		"expStatuses": [
+		    {
+			"action": "loss",
+			"error": "can not find the nodes",
+			"scope": "node",
+			"state": "Error",
+			"success": false,
+			"target": "network"
+		    }
+		],
+		"phase": "Error"
+	    }
+	}
+	
+今天没弄明白🤔
 
 ## 9.3 基于grafana里的alert功能实现动态报警
 
