@@ -814,6 +814,12 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 
 ## 8.2 Istio路由规则配置：VirtualService
 
+istio的VirtualService和DestinationRule，是用来进行流量控制的，但是istio用它们具体做什么事情呢？对envoy产生了那些影响呢？
+
+VirtualService是用来修改route规则的，这样就可以将流量转发到不同的cluster。
+
+DestinationRule是用来改写cluster的，不同的cluster有响应的endpoint，这样方便route。
+
 ## 8.3 Istio目标规则配置：DestinationRule
 
 	1.TrafficPolicy
@@ -1060,6 +1066,20 @@ Step 1: 下载 chaosblade-operator ，利用 helm v3 方式安装
 	}
 	
 今天没弄明白🤔
+
+## 9.3 Istio 自己的Fault Injection
+
+检查bookinfo是否启用的是默认路由
+
+kubectl get destinationrules -o yaml 【输出当前执行的路由规则文件】
+
+1、注入HTTP延迟故障
+
+在reviews的v2 服务和 ratings服务间注入 7s 延迟，执行故障文件
+
+	kubectl apply -f samples/bookinfo/networking/virtual-service-ratings-test-delay.yaml
+
+
 
 ## 9.3 基于grafana里的alert功能实现动态报警
 
