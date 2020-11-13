@@ -1085,7 +1085,7 @@ kubectl get destinationrules -o yaml 【输出当前执行的路由规则文件�
 
 
 
-
+ 
 # 十、istio数据持久化
 
 
