@@ -1167,12 +1167,15 @@ Step 1: 下载 chaosblade-operator ，利用 helm v3 方式安装
 
 kubectl get destinationrules -o yaml 【输出当前执行的路由规则文件】
 
-1、注入HTTP延迟故障
-
-在reviews的v2 服务和 ratings服务间注入 7s 延迟，执行故障文件
+1、注入HTTP延迟故障：为jason 用户的reviews的v1 服务和 ratings服务间注入 7s 延迟，执行故障文件
 
 	kubectl apply -f samples/bookinfo/networking/virtual-service-ratings-test-delay.yaml
 
+2、打开网页开发者模式查看结果
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E5%BB%B6%E6%97%B67s.png)
+
+发现jason只能访问第一版本的reviews，并看到了bug，但是不清楚怎么看出7s延时
 
 
 ## 9.3 基于grafana里的alert功能实现动态报警
