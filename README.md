@@ -786,10 +786,27 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 	
 ## 【实验 3】动态管理条件路由
 
-描述：实现金丝雀发布。
+描述：实现自动化灰度发布。
 
+过程：用 Flagger对 ad服务的 v2版本进行灰度发布,自动调整流量比例,直到 v2版本全部接管流量,完成灰度发布。
 
+【注】实验开始前已部署开源微服务系统 https://github.com/slzcc/cloud-native-istio
 
+Step 1: 进入 cloud-native-istio/chapter-files/canary-release/ ，部署 ad服务
+
+	kubectl apply -f ad-deployment.yaml  -n weather
+	
+Step 2:创建Flagger 的 CRD资源，其中定义了自动化灰度发布的相关参数
+
+	kubectl apply -f auto-canary.yaml  -n weather
+	
+	【若报错，需要手动修改一下，参考flagger的资源官方样例】
+
+Step 3:进入容器[frontend-v1-fb4f47456-9vqg8]内部，对ad服务发起连续请求，时间间隔为1s：
+
+	kubectl -n weather exec -it frontend-v1-fb4f47456-9vqg8 bash
+	
+	root@frontend-v1-fb4f47456-9vqg8:/app# for i in 'seg 1 1000'; do curl http://ad.weather:3003/ad --silent --w "Status: %{http_code}\n" -o /dev/null ;sleep 1;done 
 
 {...loading}
 
