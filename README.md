@@ -786,6 +786,8 @@ Step 3: 利用header 进行条件匹配，查看client 的访问
 	
 ## 【实验 3】动态管理条件路由
 
+Flagger是一个用于全自动化渐进式完成应用发布的Kubernetes operator，它通过分析Prometheus收集到的监控指标并通过Istio、App Mesh等流量管理技术或工具完成应用的渐进式发布。
+
 描述：实现自动化灰度发布。
 
 过程：用 Flagger对 ad服务的 v2版本进行灰度发布,自动调整流量比例,直到 v2版本全部接管流量,完成灰度发布。
@@ -796,20 +798,57 @@ Step 1: 进入 cloud-native-istio/chapter-files/canary-release/ ，部署 ad服�
 
 	kubectl apply -f ad-deployment.yaml  -n weather
 	
-Step 2:创建Flagger 的 CRD资源，其中定义了自动化灰度发布的相关参数
+Step 2: 创建Flagger 的 CRD资源，其中定义了自动化灰度发布的相关参数
 
 	kubectl apply -f auto-canary.yaml  -n weather
 	
 	【若报错，需要手动修改一下，参考flagger的资源官方样例】
 
-Step 3:进入容器[frontend-v1-fb4f47456-9vqg8]内部，对ad服务发起连续请求，时间间隔为1s：
+Step 3: 进入容器[frontend-v1-fb4f47456-9vqg8]内部，对ad服务发起连续请求，时间间隔为1s：
 
 	kubectl -n weather exec -it frontend-v1-fb4f47456-9vqg8 bash
 	
 	root@frontend-v1-fb4f47456-9vqg8:/app# for i in 'seg 1 1000'; do curl http://ad.weather:3003/ad --silent --w "Status: %{http_code}\n" -o /dev/null ;sleep 1;done 
 
-{...loading}
+Step 4: 执行更新 ad服务的 Deployment的镜像，触发对v2版本的灰度发布任务：
+	
+	kubectl -n weather set image deployment/ad ad=istioweather/advertisement:v2 
 
+Sept 5: 查看结果
+
+	kubectl describe canary ad -n weather 
+	
+	【提示】
+	
+	  Status:
+	  Canary Weight:  20
+	  Conditions:
+	    Last Transition Time:  2020-11-15T03:09:01Z
+	    Last Update Time:      2020-11-15T03:09:01Z
+	    Message:               New revision detected, progressing canary analysis.
+	    Reason:                Progressing
+	    Status:                Unknown
+	    Type:                  Promoted
+	  Failed Checks:           1
+	  Iterations:              0
+	  Last Applied Spec:       7f7db87c66
+	  Last Transition Time:    2020-11-15T03:10:21Z
+	  Phase:                   Progressing
+	  Tracked Configs:
+	Events:
+	  Type     Reason  Age                From     Message
+	  ----     ------  ----               ----     -------
+	  Warning  Synced  12m                flagger  ad-primary.weather not ready: waiting for rollout to finish: observed deployment generation less then desired generation
+	  Normal   Synced  11m (x2 over 12m)  flagger  all the metrics providers are available!
+	  Normal   Synced  11m                flagger  Initialization done! ad.weather
+	  Normal   Synced  101s               flagger  New revision detected! Scaling up ad.weather
+	  Normal   Synced  1m                 flagger  Starting canary analysis for ad.weather
+	  Normal   Synced  1m                 flagger  Advance ad.weather canary weight 20
+	  Normal   Synced  61s                flagger  Advance ad.weather canary weight 40
+	  Normal   Synced  40s                flagger  Advance ad.weather canary weight 80
+	  ...
+
+如果检测到的 Metrics值始终低于设定的门限值, Flagger就会按照设定的步长(20%）逐步增加v2版本的流量比例。在达到100%后, Flagger会将 ad-primary的 Deployment的镜像改为v2,删掉临时的 Deployment,完成对v2版本的灰度发布。
 
 # 八、istio非侵入流量治理
 
