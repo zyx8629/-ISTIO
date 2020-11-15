@@ -803,6 +803,56 @@ Step 2: 创建Flagger 的 CRD资源，其中定义了自动化灰度发布的相
 	kubectl apply -f auto-canary.yaml  -n weather
 	
 	【若报错，需要手动修改一下，参考flagger的资源官方样例】
+	
+	💁🏻auto-canary.yaml
+
+	apiVersion: flagger.app/v1beta1
+	kind: Canary
+	metadata:
+	  name: ad
+	  namespace: weather
+	spec:
+	  # deployment reference
+	  targetRef:
+	    apiVersion: apps/v1
+	    kind: Deployment
+	    name: ad
+	  # the maximum time in seconds for the canary deployment
+	  # to make progress before it is rollback (default 600s)
+	  progressDeadlineSeconds: 60
+	  service:
+	    # container port
+	    port: 3003
+	    # Istio virtual service host names (optional)
+	    hosts:
+	    - ad
+	  analysis:
+	    # schedule interval (default 60s)
+	    interval: 40s
+	    # max number of failed metric checks before rollback
+	    threshold: 3
+	    # max traffic percentage routed to canary
+	    # percentage (0-100)
+	    maxWeight: 100
+	    # canary increment step
+	    # percentage (0-100)
+	    stepWeight: 20
+	    metrics:
+	    - name: "request error rate"
+	      threshold: 5
+	      query: |
+		100 - sum(rate(istio_requests_total{
+		     reporter="destination",
+		     destination_service_namespace="weather",
+		     destination_workload="ad",
+		     response_code="200"
+		  }[30s]
+		))/sum(rate(istio_requests_total{
+		     reporter="destination",
+		     destination_service_namespace="weather",
+		     destination_workload="ad",
+		  }[30s]
+		)) * 100
 
 Step 3: 进入容器[frontend-v1-fb4f47456-9vqg8]内部，对ad服务发起连续请求，时间间隔为1s：
 
@@ -855,18 +905,6 @@ Sept 5: 查看结果
 ## 8.1 流量治理的原理
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%B5%81%E9%87%8F%E6%B2%BB%E7%90%86%E6%B5%81%E7%A8%8B.png)
-
-8.1.1 负载均衡
-
-8.1.2 服务熔断
-
-8.1.3 故障注入
-
-8.1.4 灰度发布
-
-8.1.5 服务访问入口
-
-8.1.6 外部接入服务治理
 
 ## 8.2 Istio路由规则配置：VirtualService
 
