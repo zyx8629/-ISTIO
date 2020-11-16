@@ -1035,7 +1035,7 @@ Step 1: 下载 chaosblade-operator ，利用 helm v3 方式安装
 	 17     - name: percent
 	 18       value: ["60"]
 	 19     - name: interface
-	 20       value: ["eth0"]
+	 20       value: ["192.168.3.13"]
 	 21     - name: local-port
 	 22       value: ["31966"]
 	
@@ -1129,7 +1129,7 @@ Step 1: 下载 chaosblade-operator ，利用 helm v3 方式安装
 			    {
 				"name": "interface",
 				"value": [
-				    "eth0"
+				    "192.168.3.13"
 				]
 			    },
 			    {
@@ -1188,6 +1188,7 @@ kubectl get destinationrules -o yaml 【输出当前执行的路由规则文件�
 打开 grafana 的 dashboard 进行邮件警告配置。但无法连接，提示没有配置 [smtp]
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%88%AA%E5%B1%8F2020-11-16%20%E4%B8%8B%E5%8D%889.24.35.png)
+
 
  
 # 十、istio数据持久化
