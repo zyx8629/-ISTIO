@@ -1173,14 +1173,21 @@ kubectl get destinationrules -o yaml 【输出当前执行的路由规则文件�
 
 2、打开网页开发者模式查看结果
 
-![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E5%BB%B6%E6%97%B67s.png)
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/new%207s.png)
 
-发现jason只能访问第一版本的reviews，并看到了bug，但是不清楚怎么看出7s延时
+登陆jason用户后网页有延时，发现jason只能访问第一版本的reviews，并看到如果主页调用另外两个版本reviews时，出现调用失败提示
 
+【如果故障执行不出来可尝试重启电脑】
 
-## 9.3 基于grafana里的alert功能实现动态报警
+## 9.3 基于grafana的alert功能实现动态报警
 
+在 /root/istio/istio-1.7.4/samples/addons 下的 grafana.yaml 的文件夹里找到了他的配置文件 configmap，然后在 grafana.ini中的配置信息中添加邮件 [smtp]功能
 
+重新执行 grafana.yaml文件，重启该服务
+
+打开 grafana 的 dashboard 进行邮件警告配置。但无法连接，提示没有配置 [smtp]
+
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%88%AA%E5%B1%8F2020-11-16%20%E4%B8%8B%E5%8D%889.24.35.png)
 
  
 # 十、istio数据持久化
