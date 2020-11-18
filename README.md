@@ -1198,12 +1198,12 @@ kubectl get destinationrules -o yaml 【输出当前执行的路由规则文件�
 	  40     [smtp]
 	  41     enabled = true
 	  42     host = smtp.qq.com:465  #qq官方给了两个端口 465 和 587 都尝试了
-	  43     user = 1029133675@qq.com
-	  44     password = ytqyfvcqkxmgbdhi   #开启smtp的服务生成的授权码
+	  43     user = ····@qq.com
+	  44     password = ····   #开启smtp的服务生成的授权码
 	  45     ;cert_file =
 	  46     ;key_file =
 	  47     skip_verify = false
-	  48     from_address = 1029133675@qq.com
+	  48     from_address = ·····@qq.com
 	  49     from_name = Grafana
 	  50     ehlo_identity = dashboard.example.com
 	  51     [emails]
