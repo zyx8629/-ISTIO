@@ -900,6 +900,45 @@ Sept 5: 查看结果
 
 如果检测到的 Metrics值始终低于设定的门限值, Flagger就会按照设定的步长(20%）逐步增加v2版本的流量比例。在达到100%后, Flagger会将 ad-primary的 Deployment的镜像改为v2,删掉临时的 Deployment,完成对v2版本的灰度发布。
 
+##【实验 四】 服务熔断
+
+【注】实验开始前已部署开源微服务系统 https://github.com/slzcc/cloud-native-istio
+
+Step 1: 进入 istio 安装目录下，为 weather 命名空间下安装 fortio
+
+	kubectl get po -l app=fortio -n weather
+	
+	fortio-deploy-6dc9b4d7d9-hx6g2     2/2     Running   0          32m
+
+Step 2: 部署forecast v2服务，并将改服务拓展为5个，进入deploment文件，把replicas 改成 5
+	
+	kubectl get po -l app=forecast -n weather
+	
+	forecast-v2-69f7db7995-bfxch       2/2     Running   0          14m
+	forecast-v2-69f7db7995-lrcbd       2/2     Running   0          14m
+	forecast-v2-69f7db7995-lxd57       2/2     Running   0          14m
+	forecast-v2-69f7db7995-lxtx6       2/2     Running   0          14m
+	forecast-v2-69f7db7995-lzfcd       2/2     Running   0          14m
+
+Step 3: 配置熔断策略，进入 /root/cloud-native-istio/chapter-files/traffic-management
+
+	kubectl apply -f circuit-breaking.yaml -n weather
+	kubectl get dr forecast-dr -o yaml -n weather
+	【提示即配置成功】
+	 trafficPolicy:
+	    connectionPool:
+	      http:
+		http1MaxPendingRequests: 5
+		maxRequestsPerConnection: 1
+	      tcp:
+		maxConnections: 3
+	    outlierDetection:
+	      baseEjectionTime: 2m
+	      consecutiveErrors: 2
+	      interval: 10s
+	      maxEjectionPercent: 40
+	#该配置的意思是；
+	
 # 八、istio非侵入流量治理
 
 ## 8.1 流量治理的原理
