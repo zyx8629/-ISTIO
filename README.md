@@ -942,16 +942,61 @@ Step 3: 配置熔断策略，进入 /root/cloud-native-istio/chapter-files/traff
 	
 Step 4: 进入fortio容器，执行如下命令，使用10个并发连续执行100此触发熔断机制
 
-	kubectl exec -it fortio-deploy-6dc9b4d7d9-hx6g2 -n weather -c fortio /usr/bin/fortio -- load -c 10 -qps 0 -n 100 -loglevel Warning http://forecast.weather:3002/weather?locate=hangzhou
-	【放弃了。。。】
-	OCI runtime exec failed: exec failed: container_linux.go:349: starting container process caused "exec: \"load\": executable file not found in $PATH": unknown
-	command terminated with exit code 126
+	kubectl exec -n weather fortio-deploy-6dc9b4d7d9-hx6g2 -c fortio -- /usr/bin/fortio load -c 10 -qps 0 -n 100 -loglevel Warning http://forecast.weather:3002/weather?locate=hangzhou
 	
-我再也不做书上的例子了😭
-	
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%88%AA%E5%B1%8F2020-11-18%20%E4%B8%8B%E5%8D%885.38.58.png)
+
+发现全部都是503，和预期不一样，说明访问时，存在连接问题，可能跟我只从一半开始做的实验有关,网关没有设置对估计
+
+决定去做一下官方样例
+
 ## 新【实验 四】 服务熔断
 
+Step 1: 启动 httpbin 样例程序,并配置熔断规则
 	
+	kubectl apply -f samples/httpbin/httpbin.yaml
+
+	kubectl apply -f - <<EOF
+	> apiVersion: networking.istio.io/v1alpha3
+	> kind: DestinationRule
+	> metadata:
+	>   name: httpbin
+	> spec:
+	>   host: httpbin
+	>   trafficPolicy:
+	>     connectionPool:
+	>       tcp:
+	>         maxConnections: 1
+	>       http:
+	>         http1MaxPendingRequests: 1
+	>         maxRequestsPerConnection: 1
+	>     outlierDetection:
+	>       consecutiveErrors: 1
+	>       interval: 1s
+	>       baseEjectionTime: 3m
+	>       maxEjectionPercent: 100
+	> EOF
+	
+	#该配置的意思是：如果对httpin 服务发起超过 1个的http连接，并存在 1个及以上的待处理请求就触发熔断
+	
+Step 2:启动fortio用户，并进行访问httpin服务，2个并发，10个循环
+	
+	kubectl apply -f samples/httpbin/sample-client/fortio-deploy.yaml
+	kubectl exec fortio-deploy-6dc9b4d7d9-5qjs6 -c fortio -- /usr/bin/fortio curl -quiet http://httpbin:8000/get
+	kubectl exec fortio-deploy-6dc9b4d7d9-5qjs6 -c fortio -- /usr/bin/fortio load -c 2 -qps 0 -n 20 -loglevel Warning http://httpbin:8000/get
+	【提示】
+	Code 200 : 15 (75.0 %)
+	Code 503 : 5 (25.0 %)
+	
+	kubectl exec fortio-deploy-6dc9b4d7d9-5qjs6 -c istio-proxy -- pilot-agent request GET stats | grep httpbin | grep pending
+	【提示】
+	cluster.outbound|8000||httpbin.default.svc.cluster.local.circuit_breakers.default.rq_pending_open: 0
+	cluster.outbound|8000||httpbin.default.svc.cluster.local.circuit_breakers.high.rq_pending_open: 0
+	cluster.outbound|8000||httpbin.default.svc.cluster.local.upstream_rq_pending_active: 0
+	cluster.outbound|8000||httpbin.default.svc.cluster.local.upstream_rq_pending_failure_eject: 0
+	cluster.outbound|8000||httpbin.default.svc.cluster.local.upstream_rq_pending_overflow: 5      # 5次请求被熔断
+	cluster.outbound|8000||httpbin.default.svc.cluster.local.upstream_rq_pending_total: 16
+
 # 八、istio非侵入流量治理
 
 ## 8.1 流量治理的原理
