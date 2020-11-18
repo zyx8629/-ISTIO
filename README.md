@@ -1183,14 +1183,41 @@ kubectl get destinationrules -o yaml 【输出当前执行的路由规则文件�
 
 在 /root/istio/istio-1.7.4/samples/addons 下的 grafana.yaml 的文件夹里找到了他的配置文件 configmap，然后在 grafana.ini中的配置信息中添加邮件 [smtp]功能
 
+	  28   grafana.ini: |
+	  29     [analytics]
+	  30     check_for_updates = true
+	  31     [grafana_net]
+	  32     url = https://grafana.net
+	  33     [log]
+	  34     mode = console
+	  35     [paths]
+	  36     data = /var/lib/grafana/data
+	  37     logs = /var/log/grafana        #还想去这个地址下查日志，也没找到，在四个节点的这个目录下都看了也没有log文件，奇奇怪怪
+	  38     plugins = /var/lib/grafana/plugins
+	  39     provisioning = /etc/grafana/provisioning
+	  40     [smtp]
+	  41     enabled = true
+	  42     host = smtp.qq.com:465  #qq官方给了两个端口 465 和 587 都尝试了
+	  43     user = 1029133675@qq.com
+	  44     password = ytqyfvcqkxmgbdhi   #开启smtp的服务生成的授权码
+	  45     ;cert_file =
+	  46     ;key_file =
+	  47     skip_verify = false
+	  48     from_address = 1029133675@qq.com
+	  49     from_name = Grafana
+	  50     ehlo_identity = dashboard.example.com
+	  51     [emails]
+	  52     ;welcome_email_on_sign_up = true
+
 重新执行 grafana.yaml文件，重启该服务
 
 打开 grafana 的 dashboard 进行邮件警告配置。但无法连接，提示没有配置 [smtp]
 
 ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%88%AA%E5%B1%8F2020-11-16%20%E4%B8%8B%E5%8D%889.24.35.png)
 
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/%E6%88%AA%E5%B1%8F2020-11-18%20%E4%B8%8A%E5%8D%8810.31.05.png)
+	
 
- 
 # 十、istio数据持久化
 
 
