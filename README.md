@@ -900,7 +900,7 @@ Sept 5: 查看结果
 
 如果检测到的 Metrics值始终低于设定的门限值, Flagger就会按照设定的步长(20%）逐步增加v2版本的流量比例。在达到100%后, Flagger会将 ad-primary的 Deployment的镜像改为v2,删掉临时的 Deployment,完成对v2版本的灰度发布。
 
-##【实验 四】 服务熔断
+## 【实验 四】 服务熔断
 
 【注】实验开始前已部署开源微服务系统 https://github.com/slzcc/cloud-native-istio
 
@@ -937,7 +937,20 @@ Step 3: 配置熔断策略，进入 /root/cloud-native-istio/chapter-files/traff
 	      consecutiveErrors: 2
 	      interval: 10s
 	      maxEjectionPercent: 40
-	#该配置的意思是；
+	
+	#该配置的意思是：如果对forecast服务发起超过3个的http连接，并存在5个及以上的待处理请求就触发熔断
+	
+Step 4: 进入fortio容器，执行如下命令，使用10个并发连续执行100此触发熔断机制
+
+	kubectl exec -it fortio-deploy-6dc9b4d7d9-hx6g2 -n weather -c fortio /usr/bin/fortio -- load -c 10 -qps 0 -n 100 -loglevel Warning http://forecast.weather:3002/weather?locate=hangzhou
+	【放弃了。。。】
+	OCI runtime exec failed: exec failed: container_linux.go:349: starting container process caused "exec: \"load\": executable file not found in $PATH": unknown
+	command terminated with exit code 126
+	
+我再也不做书上的例子了😭
+	
+## 新【实验 四】 服务熔断
+
 	
 # 八、istio非侵入流量治理
 
