@@ -40,7 +40,7 @@ Pod-level usage metrics for Filesystems, CPU, and Memory
 
 Container-level usage metrics for Filesystems, CPU, and Memory
 
-# gRPC metric
+# 1 、 gRPC metric
 
 * request inbound rate  #请求入站速率
 
@@ -77,9 +77,10 @@ percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms�
     sum(rate(grpc_server_handling_seconds_count{job="foo",grpc_type="unary"}[5m])) by (grpc_service)
     ) * 100.0
 
-# kube-state-metrics 【 https://github.com/kubernetes/kube-state-metrics/tree/master/docs 】
 
-* Network Policy Metrics
+# 2 、kube-state-metrics [ https://github.com/kubernetes/kube-state-metrics/tree/master/docs ]
+
+## Network Policy Metrics
 
 |              Metric name              | Metric type |                         Labels/tags                          |    Status    |
 | :-----------------------------------: | :---------: | :----------------------------------------------------------: | :----------: |
@@ -87,5 +88,24 @@ percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms�
 |       kube_networkpolicy_labels       |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
 | kube_networkpolicy_spec_egress_rules  |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
 | kube_networkpolicy_spec_ingress_rules |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
+
+
+## Pod Metrics
+
+* To get the list of pods that are in the Unknown state #查未知状态的pod
+
+    sum(kube_pod_status_phase{phase="Unknown"}) by (namespace, pod) or (count(kube_pod_deletion_timestamp) by (namespace, pod) * sum(kube_pod_status_reason{reason="NodeLost"}) by(namespace, pod))
+
+* For Pods in Terminating state #查找正在被销毁的pod
+
+    count(kube_pod_deletion_timestamp) by (namespace, pod) * count(kube_pod_status_reason{reason="NodeLost"} == 0) by (namespace, pod)
+
+## Node Metrics
+
+|        Metric name         | Metric type |                         Labels/tags                          | Status |
+| :------------------------: | :---------: | :----------------------------------------------------------: | :----: |
+| kube_node_status_capacity  |    Gauge    | `node`=<node-address><br/>`resource`=<resource-name><br/>`unit`=<resource-unit> | STABLE |
+| kube_node_status_condition |    Gauge    | `node`=<node-address><br/>`condition`=<node-condition><br/>`status`=<true\|false\|unknown> | STABLE |
+
 
 
