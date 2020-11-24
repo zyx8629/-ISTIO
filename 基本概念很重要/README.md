@@ -40,7 +40,9 @@
   
   ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/mesh.jpeg)
   
-  就能看出在拥有 服务网格 的命名空间下，既然已经实现了一个更细致的流量管理，就已经不再体现上层流量代理（kube-proxy）的作用了，就更不太体现不同 node 间的 pod通信交互（虚拟网桥）的复杂了（虽然不知道这么说对不对～），主要还是在于 “Envoy” 的帮助，通过配置 “Envoy Config” ，在各个服务中进行规则的动态转发。
+  就能看出在拥有 服务网格 的命名空间下，既然已经实现了一个更细致的流量管理，就已经不再体现上层流量代理（kube-proxy）的作用了，就更不太体现不同 node 间的 pod通信交互（虚拟网桥）的那些问题了（虽然不知道这么说对不对～）。主要还是在于 “Envoy” 的全部接管，通过配置 “Envoy Config” ，在各个服务中进行规则的动态转发。至于 “Envoy Config” ·······找到这样一个思路图。
+  
+  ![image](https://github.com/zyx8629/-ISTIO/blob/main/images/envoy-config.png)
   
   
   
