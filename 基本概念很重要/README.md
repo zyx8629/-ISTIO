@@ -14,5 +14,11 @@
 
 ## 问题 3 ：如何理解kubernetes operator这个概念
 
+![image](https://github.com/zyx8629/-ISTIO/blob/main/images/Question-3.png)
+
+举个 🌰
+
+在前面学习过程中，我使用过一个叫做 flagger 的框架，实现了一下自动化金丝雀发布。整个实现过程就是通过根据官方样例，自定义分析参数、度量指标写一个 CRD.yaml 文件，并执行，那么 flagger 在这次实践中就是一个 operator ，它会自动帮我从 Prometheus 中提取 metric 数据，按设定的公式进行阈值计算，如果该值达到预期的设定，就按权重进行逐步的流量导入，如果不成功则自动退回就版本。这样的过程就是基于一个 operator 实现一个自动化扩展 K8s 资源的操作。
+
 ## 问题 4 ：用一个场景对istio流量规则的实现进行描述 
 
