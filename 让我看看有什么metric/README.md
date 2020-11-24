@@ -84,10 +84,10 @@ percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms�
 
 |              Metric name              | Metric type |                         Labels/tags                          |    Status    |
 | :-----------------------------------: | :---------: | :----------------------------------------------------------: | :----------: |
-|      kube_networkpolicy_created       |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
-|       kube_networkpolicy_labels       |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
-| kube_networkpolicy_spec_egress_rules  |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
-| kube_networkpolicy_spec_ingress_rules |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
+|      kube_networkpolicy_created       |    Gauge    | namespace=<namespace name\>                                             networkpolicy=<networkpolicy name\> | EXPERIMENTAL |
+|       kube_networkpolicy_labels       |    Gauge    | namespace=<namespace name\>                                             networkpolicy=<networkpolicy name\> | EXPERIMENTAL |
+| kube_networkpolicy_spec_egress_rules  |    Gauge    | namespace=<namespace name\>                                             networkpolicy=<networkpolicy name\> | EXPERIMENTAL |
+| kube_networkpolicy_spec_ingress_rules |    Gauge    | namespace=<namespace name\>                                             networkpolicy=<networkpolicy name\> | EXPERIMENTAL |
 
 
 ## Pod Metrics
@@ -104,8 +104,8 @@ percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms�
 
 |        Metric name         | Metric type |                         Labels/tags                          | Status |
 | :------------------------: | :---------: | :----------------------------------------------------------: | :----: |
-| kube_node_status_capacity  |    Gauge    | `node`=<node-address><br/>`resource`=<resource-name><br/>`unit`=<resource-unit> | STABLE |
-| kube_node_status_condition |    Gauge    | `node`=<node-address><br/>`condition`=<node-condition><br/>`status`=<true\|false\|unknown> | STABLE |
+| kube_node_status_capacity  |    Gauge    | `node`=<node-address\><br/>`resource`=<resource-name\><br/>`unit`=<resource-unit\> | STABLE |
+| kube_node_status_condition |    Gauge    | `node`=<node-address\><br/>`condition`=<node-condition\><br/>`status`=<true\|false\|unknown> | STABLE |
 
 
 
