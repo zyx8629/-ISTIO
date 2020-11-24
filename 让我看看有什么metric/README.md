@@ -1,46 +1,4 @@
-#  Metric Requirements
-
-## Kubelet
-
- Node-level usage metrics for Filesystems, CPU, and Memory
-
- Pod-level usage metrics for Filesystems and Memory
-
-## Metrics Server (outlined in Monitoring Architecture), which exposes the Resource Metrics API to the following system components:
-
-Scheduler
-
-Node-level usage metrics for Filesystems, CPU, and Memory
-
-Pod-level usage metrics for Filesystems, CPU, and Memory
-
-## Vertical-Pod-Autoscaler
-
-Node-level usage metrics for Filesystems, CPU, and Memory
-
-Pod-level usage metrics for Filesystems, CPU, and Memory
-
-Container-level usage metrics for Filesystems, CPU, and Memory
-
-## Horizontal-Pod-Autoscaler
-
-Node-level usage metrics for CPU and Memory
-
-Pod-level usage metrics for CPU and Memory
-
-## Cluster Federation
-
-Node-level usage metrics for Filesystems, CPU, and Memory
-
-## kubectl top and Kubernetes Dashboard
-
-Node-level usage metrics for Filesystems, CPU, and Memory
-
-Pod-level usage metrics for Filesystems, CPU, and Memory
-
-Container-level usage metrics for Filesystems, CPU, and Memory
-
-# 1 、 gRPC metric
+# 1 、 基于 prometheus 的gRPC metric
 
 * request inbound rate  #请求入站速率
 
@@ -210,5 +168,11 @@ percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms�
 3. 用于 hpa 中external类型的数据来源，需要云厂商或平台自己实现适配器（custom metrics adapters）
 
        Stackdriver
+       
+# k8s 提供的 metrics-server
+
+主要是cpu，memory使用率指标
 
    
+# 基于 prometheus 的 cadvisor
+
