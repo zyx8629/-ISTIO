@@ -126,6 +126,8 @@ percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms�
       
 # 4、Horizontal Pod Autoscaler metrics 【在这里发现了定义多维度metric的样例 https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/ 】
 
+* 定义多维指标
+  
       apiVersion: autoscaling/v2beta2
       kind: HorizontalPodAutoscaler
       metadata:
@@ -185,4 +187,28 @@ percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms�
             current:
               value: 10k
 
-      
+* HAP指标类型
+
+      Object类型：Object类型是用于描述k8s内置对象的指标，例如ingress对象中hits-per-second指标
+      Pods类型：pods类型描述当前扩容目标中每个pod的指标（例如，每秒处理的事务数）。在与目标值进行比较之前，将对值进行平均。
+      Resource类型：Resource是Kubernetes已知的资源指标,如request和limit中所指定的，描述当前扩容目标的每个pod（例如CPU或内存）。该指标将会在与目标值对比前进行平均，被此类指标内置于Kubernetes中,且使用"pods"源在正常的每个pod度量标准之上提供特殊的扩展选项。
+      External 类型：ExternalMetricSource指示如何扩展与任何Kubernetes对象无关的指标（例如，云消息传递服务中的队列长度，或集群外部运行的负载均衡器的QPS）。
+    
+* HAP指标来源
+
+1. 用于hpa 中Resource类型数据来源.
+
+       metric-server
+       heapster
+       
+2. 用于hpa 中object/pods类型的数据来源，需要自己实现适配器
+
+       Prometheus Adapter
+       Microsoft Azure Adapter
+       Google Stackdriver
+       
+3. 用于 hpa 中external类型的数据来源，需要云厂商或平台自己实现适配器（custom metrics adapters）
+
+       Stackdriver
+
+   
