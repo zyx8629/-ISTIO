@@ -107,5 +107,82 @@ percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms�
 | kube_node_status_capacity  |    Gauge    | `node`=<node-address\><br/>`resource`=<resource-name\><br/>`unit`=<resource-unit\> | STABLE |
 | kube_node_status_condition |    Gauge    | `node`=<node-address\><br/>`condition`=<node-condition\><br/>`status`=<true\|false\|unknown> | STABLE |
 
+# 3、Kube-state-metrics self metrics
 
+* kube-state-metrics exposes list and watch success and error metrics
 
+      kube_state_metrics_list_total{resource="*v1.Node",result="success"} 1
+      kube_state_metrics_list_total{resource="*v1.Node",result="error"} 52
+      kube_state_metrics_watch_total{resource="*v1beta1.Ingress",result="success"} 1
+
+* kube-state-metrics exposes some http request metrics
+
+      http_request_duration_seconds_bucket{handler="metrics",method="get",le="2.5"} 30
+      http_request_duration_seconds_bucket{handler="metrics",method="get",le="5"} 30
+      http_request_duration_seconds_bucket{handler="metrics",method="get",le="10"} 30
+      http_request_duration_seconds_bucket{handler="metrics",method="get",le="+Inf"} 30
+      http_request_duration_seconds_sum{handler="metrics",method="get"} 0.021113919999999998
+      http_request_duration_seconds_count{handler="metrics",method="get"} 30
+      
+# 4、Horizontal Pod Autoscaler metrics 【在这里发现了定义多维度metric的样例 https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/ 】
+
+      apiVersion: autoscaling/v2beta2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: php-apache    #对这个pod做垂直伸缩
+      spec:
+        scaleTargetRef:
+          apiVersion: apps/v1
+          kind: Deployment
+          name: php-apache
+        minReplicas: 1     #最小有1个副本
+        maxReplicas: 10    #最多有十个副本
+        metrics:           #开始自定义度量标准
+        - type: Resource
+          resource:
+            name: cpu     #cpu平均利用率50%
+            target:
+              type: Utilization
+              averageUtilization: 50
+        - type: Pods
+          pods:         #pod每秒接受的数据达到1k
+            metric:
+              name: packets-per-second
+            target:
+              type: AverageValue
+              averageValue: 1k
+        - type: Object
+          object:
+            metric:
+              name: requests-per-second
+            describedObject:
+              apiVersion: networking.k8s.io/v1beta1
+              kind: Ingress
+              name: main-route
+            target:
+              type: Value
+              value: 10k
+      status:
+        observedGeneration: 1
+        lastScaleTime: <some-time>
+        currentReplicas: 1
+        desiredReplicas: 1
+        currentMetrics:
+        - type: Resource
+          resource:
+            name: cpu
+          current:
+            averageUtilization: 0
+            averageValue: 0
+        - type: Object
+          object:
+            metric:
+              name: requests-per-second
+            describedObject:
+              apiVersion: networking.k8s.io/v1beta1
+              kind: Ingress
+              name: main-route
+            current:
+              value: 10k
+
+      
