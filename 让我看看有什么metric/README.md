@@ -1,9 +1,10 @@
 #  Metric Requirements
 
 ## Kubelet
-Node-level usage metrics for Filesystems, CPU, and Memory
 
-Pod-level usage metrics for Filesystems and Memory
+ Node-level usage metrics for Filesystems, CPU, and Memory
+
+ Pod-level usage metrics for Filesystems and Memory
 
 ## Metrics Server (outlined in Monitoring Architecture), which exposes the Resource Metrics API to the following system components:
 
@@ -41,34 +42,34 @@ Container-level usage metrics for Filesystems, CPU, and Memory
 
 # gRPC metric
 
-request inbound rate  #请求入站速率
+* request inbound rate  #请求入站速率
 
     sum(rate(grpc_server_started_total{job="foo"}[1m])) by (grpc_service)
  
-unary request error rate #一元请求错误率
+* unary request error rate #一元请求错误率
 
     sum(rate(grpc_server_handled_total{job="foo",grpc_type="unary",grpc_code!="OK"}[1m])) by (grpc_service)
 
-unary request error percentage。#请求错误百分比
+* unary request error percentage。#请求错误百分比
 
     sum(rate(grpc_server_handled_total{job="foo",grpc_type="unary",grpc_code!="OK"}[1m])) by (grpc_service)
      / 
     sum(rate(grpc_server_started_total{job="foo",grpc_type="unary"}[1m])) by (grpc_service)
      * 100.0
 
-average response stream size #平均响应流大小
+* average response stream size #平均响应流大小
 
     sum(rate(grpc_server_msg_sent_total{job="foo",grpc_type="server_stream"}[10m])) by (grpc_service)
      /
     sum(rate(grpc_server_started_total{job="foo",grpc_type="server_stream"}[10m])) by (grpc_service)
 
-99%-tile latency of unary requests  #99%响应时间的延迟
+* * 99%-tile latency of unary requests  #99%响应时间的延迟
 
      histogram_quantile(0.99, 
       sum(rate(grpc_server_handling_seconds_bucket{job="foo",grpc_type="unary"}[5m])) by (grpc_service,le)
     )
 
-percentage of slow unary queries (>250ms) #慢速一元查询百分比（>250ms）
+percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms）
 
     100.0 - (
     sum(rate(grpc_server_handling_seconds_bucket{job="foo",grpc_type="unary",le="0.25"}[5m])) by (grpc_service)
@@ -76,6 +77,15 @@ percentage of slow unary queries (>250ms) #慢速一元查询百分比（>250ms�
     sum(rate(grpc_server_handling_seconds_count{job="foo",grpc_type="unary"}[5m])) by (grpc_service)
     ) * 100.0
 
-# HPA metric 
+# kube-state-metrics 【 https://github.com/kubernetes/kube-state-metrics/tree/master/docs 】
 
-# kube-state-metrics
+* Network Policy Metrics
+
+|              Metric name              | Metric type |                         Labels/tags                          |    Status    |
+| :-----------------------------------: | :---------: | :----------------------------------------------------------: | :----------: |
+|      kube_networkpolicy_created       |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
+|       kube_networkpolicy_labels       |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
+| kube_networkpolicy_spec_egress_rules  |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
+| kube_networkpolicy_spec_ingress_rules |    Gauge    | namespace=<namespace name>                                             networkpolicy=<networkpolicy name> | EXPERIMENTAL |
+
+
