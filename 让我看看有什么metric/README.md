@@ -1,39 +1,33 @@
 # 1 、 基于 prometheus 的gRPC metric
 
 * request inbound rate  #请求入站速率
-
-    sum(rate(grpc_server_started_total{job="foo"}[1m])) by (grpc_service)
+	
+   	 sum(rate(grpc_server_started_total{job="foo"}[1m])) by (grpc_service)
  
 * unary request error rate #一元请求错误率
 
-    sum(rate(grpc_server_handled_total{job="foo",grpc_type="unary",grpc_code!="OK"}[1m])) by (grpc_service)
+   	 sum(rate(grpc_server_handled_total{job="foo",grpc_type="unary",grpc_code!="OK"}[1m])) by (grpc_service)
 
 * unary request error percentage。#请求错误百分比
 
-    sum(rate(grpc_server_handled_total{job="foo",grpc_type="unary",grpc_code!="OK"}[1m])) by (grpc_service)
-     / 
-    sum(rate(grpc_server_started_total{job="foo",grpc_type="unary"}[1m])) by (grpc_service)
-     * 100.0
+	    sum(rate(grpc_server_handled_total{job="foo",grpc_type="unary",grpc_code!="OK"}[1m])) by (grpc_service)
+	     / 
+	    sum(rate(grpc_server_started_total{job="foo",grpc_type="unary"}[1m])) by (grpc_service) * 100.0
 
 * average response stream size #平均响应流大小
 
-    sum(rate(grpc_server_msg_sent_total{job="foo",grpc_type="server_stream"}[10m])) by (grpc_service)
-     /
-    sum(rate(grpc_server_started_total{job="foo",grpc_type="server_stream"}[10m])) by (grpc_service)
+	    sum(rate(grpc_server_msg_sent_total{job="foo",grpc_type="server_stream"}[10m])) by (grpc_service)
+	     /
+	    sum(rate(grpc_server_started_total{job="foo",grpc_type="server_stream"}[10m])) by (grpc_service)
 
-* * 99%-tile latency of unary requests  #99%响应时间的延迟
+* 99%-tile latency of unary requests  # 99%响应时间的延迟
 
-     histogram_quantile(0.99, 
-      sum(rate(grpc_server_handling_seconds_bucket{job="foo",grpc_type="unary"}[5m])) by (grpc_service,le)
-    )
+    	 histogram_quantile(0.99, 
+      sum(rate(grpc_server_handling_seconds_bucket{job="foo",grpc_type="unary"}[5m])) by (grpc_service,le))
 
-percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms）
+* percentage of slow unary queries (>250ms) #慢速查询百分比（时间>250ms）
 
-    100.0 - (
-    sum(rate(grpc_server_handling_seconds_bucket{job="foo",grpc_type="unary",le="0.25"}[5m])) by (grpc_service)
-     / 
-    sum(rate(grpc_server_handling_seconds_count{job="foo",grpc_type="unary"}[5m])) by (grpc_service)
-    ) * 100.0
+	    100.0 - (sum(rate(grpc_server_handling_seconds_bucket{job="foo",grpc_type="unary",le="0.25"}[5m])) by (grpc_service)/ sum(rate(grpc_server_handling_seconds_count{job="foo",grpc_type="unary"}[5m])) by (grpc_service)) * 100.0
 
 
 # 2 、kube-state-metrics  [ https://github.com/kubernetes/kube-state-metrics/tree/master/docs ]
