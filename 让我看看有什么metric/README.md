@@ -168,13 +168,55 @@
 主要是cpu，memory使用率指标
 
    
-# 基于 prometheus 的 cadvisor
+# 基于 prometheus 的 cadvisor [https://github.com/google/cadvisor/blob/master/metrics/prometheus.go]
 
+这是一个容器监控工具，基于 prometheus 参数，也是找到了他的代码，看到了一些函数在计算 metric 参数
+
+	1、	c.containerMetrics: []containerMetric{
+			{
+				name:      "container_last_seen",
+				help:      "Last time a container was seen by the exporter",
+				valueType: prometheus.GaugeValue,
+				getValues: func(s *info.ContainerStats) metricValues {
+					return metricValues{{
+						value:     float64(now.Now().Unix()),
+						timestamp: now.Now(),
+					}}
+				},
+			},
+		},
+	2、	c.containerMetrics = append(c.containerMetrics, []containerMetric{
+			{
+				name:      "container_cpu_user_seconds_total",
+				help:      "Cumulative user cpu time consumed in seconds.",
+				valueType: prometheus.CounterValue,
+				getValues: func(s *info.ContainerStats) metricValues {
+					return metricValues{
+						{
+							value:     float64(s.Cpu.Usage.User) / float64(time.Second),
+							timestamp: s.Timestamp,
+						},
+					}
+				},
+			}, {
+				name:      "container_cpu_system_seconds_total",
+				help:      "Cumulative system cpu time consumed in seconds.",
+				valueType: prometheus.CounterValue,
+				getValues: func(s *info.ContainerStats) metricValues {
+					return metricValues{
+						{
+							value:     float64(s.Cpu.Usage.System) / float64(time.Second),
+							timestamp: s.Timestamp,
+						},
+					}
+				},
+			}, {
+			
+			。。。。。。
+		
 # 基于 prometheus 的 haproxy_exporter [https://github.com/prometheus/haproxy_exporter/blob/master/haproxy_exporter.go]
 
 这是一个负载均衡器的监测器，没有公式，但是找到了一些代码，也可以看看他定义了哪些方面的metric，主要是依靠提取 prometheus 的监测参数，在代码最前面有引入 prometheus 相关工具包，还定一个三种类型metric的计算函数
-
-没学过go语言可能说的不太准确😛
 
 * serverMetric
 
