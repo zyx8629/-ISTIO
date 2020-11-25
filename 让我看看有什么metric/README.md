@@ -313,4 +313,6 @@
 	        newBackendMetric("http_connect_time_average_seconds", "Avg. HTTP connect time for last 1024 successful connections.", prometheus.GaugeValue, nil),
 	        newBackendMetric("http_response_time_average_seconds", "Avg. HTTP response time for last 1024 successful connections.", prometheus.GaugeValue, nil),
 	        newBackendMetric("http_total_time_average_seconds", "Avg. HTTP total time for last 1024 successful connections.", prometheus.GaugeValue, nil),
+		
+## 总体上看了一些文档，基于prometheus监测数据的做为参数的在进行计算的比较多，之后需要关注这个事儿
 	
