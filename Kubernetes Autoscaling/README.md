@@ -20,7 +20,9 @@
 
 ## Setting Up HPA
 
-1、部署 Kubernetes Metrics Server.由于没有科学上网，导致metrics-server镜像没下载成，来弄了一下午😭
+1、部署 Kubernetes Metrics Server.由于没有科学上网，导致metrics-server镜像没下载成，弄了一下午😭
+
+尝试解决：在本地 pull 镜像，同时也给部署文件增加设置 nodeSelector 将该服务固定在 master 上，但没有啥用呢
 
 2、制作YAML文件 
 
@@ -101,7 +103,7 @@ kubectl get hpa -n zyx-hpa
     NAME    REFERENCE          TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
     nginx   Deployment/nginx   <unknown>/50%   1         10        1          6h28m
     
- ⚠️<unknown>就是因为我的metrics-server服务没起来，所以监测不到，但我今天怎么也没给他部署上，哭了
+ ⚠️<unknown>就是因为我的metrics-server服务没起来，所以监测不到，但我今天怎么也没给他部署上
    
 4、增加pod负载
 
