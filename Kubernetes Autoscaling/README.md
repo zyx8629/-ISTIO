@@ -20,10 +20,97 @@
 
 ## Setting Up HPA
 
-1、制作YAML文件
+1、部署 Kubernetes Metrics Server.由于没有科学上网，导致metrics-server镜像没下载成，来弄了一下午😭
 
-2、部署hpa
+2、制作YAML文件 
 
-3、增加pod负载
+nginx-hpa.yaml
 
-4、查看pod set状态
+      1 apiVersion: autoscaling/v2beta2
+      2 kind: HorizontalPodAutoscaler
+      3 metadata:
+      4   name: nginx
+      5 spec:
+      6   scaleTargetRef:
+      7     apiVersion: apps/v1
+      8     kind: Deployment
+      9     name: nginx
+     10   minReplicas: 1
+     11   maxReplicas: 10
+     12   metrics:
+     13   - type: Resource
+     14     resource:
+     15       name: cpu
+     16       target:
+     17         type: Utilization
+     18         averageUtilization: 50                               
+
+ngnix.yaml
+
+      1  apiVersion: apps/v1
+      2 kind: Deployment
+      3 metadata:
+      4   name: nginx
+      5   namespace: zyx-hpa
+      6 spec:
+      7   replicas: 1
+      8   selector:
+      9     matchLabels:
+     10       app: nginx
+     11   template:
+     12     metadata:
+     13       labels:
+     14         app: nginx
+     15     spec:
+     16       containers:
+     17       - name: nginx
+     18         image: nginx:1.7.9
+     19         ports:
+     20         - containerPort: 80
+     21         resources:
+     22           limits:
+     23             cpu: 500m
+     24           requests:
+     25             cpu: 300m
+     26 ---
+     27 apiVersion: v1
+     28 kind: Service
+     29 metadata:
+     30   name: nginx
+     31   labels:
+     32     app: nginx
+     33 spec:
+     34   type: NodePort
+     35   ports:
+     36   - port: 80
+     37     protocol: TCP
+     38     targetPort: 80
+     39     name: http
+     40     nodePort: 30088
+     41   selector:
+     42     app: nginx               
+
+is-client.yaml  客户端，用了前面实验的文件
+
+3、部署hpa
+
+kubectl apply -f nginx-hpa.yaml -n zyx-hpa
+
+kubectl get hpa -n zyx-hpa
+
+    NAME    REFERENCE          TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+    nginx   Deployment/nginx   <unknown>/50%   1         10        1          6h28m
+    
+ ⚠️<unknown>就是因为我的metrics-server服务没起来，所以监测不到，但我今天怎么也没给他部署上，哭了
+   
+4、增加pod负载
+
+进入client内部，向nginx的pod发起连续访问
+
+    kubectl -n zyx-hpa exec -it client-c565c4f7-htthk -- sh
+    / # while sleep 0.01; do wget -q -O- http://192.168.3.11:30088; done    
+
+5、查看pod、deployment、hpa状态
+
+应该是要看见pod的动态伸缩的，可惜监测服务有部上
+
