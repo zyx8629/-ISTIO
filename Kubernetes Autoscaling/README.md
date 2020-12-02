@@ -22,6 +22,8 @@
 
 1、部署 Kubernetes 的 metrics-server.
 
+* 利用 kubectl top no 检查是否采集到了数据
+
 2、制作YAML文件 
 
 nginx-hpa.yaml
@@ -116,3 +118,9 @@ kubectl get hpa -n zyx-hpa
         nginx   Deployment/nginx   6%/20%    1         10        1          2d1h
 
 * 不过可以看到metrics-server已经开始对容器内cpu利用率的进行监测。。。。
+
+6、修改一下hpa规则
+
+    
+
+
