@@ -41,4 +41,9 @@
 * 此时无论执行几次访问都只能访问一个服务
 * 水平扩展容器 docker-compose up -d --scale whoami=2
 
-
+        Starting traefik_whoami_1 ... 
+        Starting traefik_whoami_1 ... done
+        Creating traefik_whoami_2 ... done
+        
+* 此时连续执行 curl -H Host:whoami.docker.localhost http://127.0.0.1 访问，发现可以访问到两个服务，遵循轮询
+* 查看 http://localhost:8080/api/rawdata 也能看见新的whoami服务启动
