@@ -121,6 +121,24 @@ kubectl get hpa -n zyx-hpa
 
 6、修改一下hpa规则
 
-    
+    - type: Pods
+    pods:
+      metric:
+        name: packets-per-second
+      target:
+        type: AverageValue
+        averageValue: 10
+    - type: Object
+    object:
+      metric:
+        name: requests-per-second
+      describedObject:
+        apiVersion: networking.k8s.io/v1beta1
+        kind: Ingress
+        name: main-route
+      target:
+        type: Value # 
+        value: 100
+
 
 
