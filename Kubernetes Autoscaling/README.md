@@ -1,4 +1,4 @@
-# 1、Horizontal Pod Autoscaling (HPA)
+# Horizontal Pod Autoscaling (HPA)
 
 * HPA can change the number of replicas of a pod, scale pods to add or remove pod container collections as needed. 
 * HPA achieves its goal by checking various metrics to see whether preset thresholds have been met and reacting accordingly. 
