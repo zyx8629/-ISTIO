@@ -20,8 +20,7 @@
 
 ## Setting Up HPA
 
-1、部署 Kubernetes Metrics Server.
-
+1、部署 Kubernetes 的 metrics-server.
 
 2、制作YAML文件 
 
@@ -111,5 +110,9 @@ kubectl get hpa -n zyx-hpa
 
 5、查看pod、deployment、hpa状态
 
-应该是要看见pod的动态伸缩的，可惜监测服务有部上
+*  kubectl get hpa -n zyx-hpa  【嘿嘿～看来只放个nginx在里面有点难达到阈值限制】
 
+        NAME    REFERENCE          TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+        nginx   Deployment/nginx   6%/20%    1         10        1          2d1h
+
+* 不过可以看到metrics-server已经开始对容器内cpu利用率的进行监测。。。。
