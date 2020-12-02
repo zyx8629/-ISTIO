@@ -124,21 +124,28 @@ kubectl get hpa -n zyx-hpa
     - type: Pods
     pods:
       metric:
-        name: packets-per-second
+        name: packets-per-second #每秒接收数据包
       target:
         type: AverageValue
-        averageValue: 10
-    - type: Object
+        averageValue: 10 #平均值 每秒接收10个
+    - type: Object 
     object:
       metric:
-        name: requests-per-second
-      describedObject:
-        apiVersion: networking.k8s.io/v1beta1
-        kind: Ingress
-        name: main-route
-      target:
-        type: Value # 
+        name: requests-per-second #每秒请求
+      describedObject:       #描述对象是什么
+        apiVersion: networking.k8s.io/v1beta1  #是来自这个api下的
+        kind: Ingress      #网关
+        name: main-route   #我们叫它“main-route”
+      target:               #我们给他定每秒处理100次请求时时触发扩容
+        type: Value # 裸值
         value: 100
 
+⚠️ 执行以后会出现问题 ，查看详情 kubectl describe hpa nginx -n zyx-hpa
+
+    Events:
+      Type     Reason                 Age                From                       Message
+      ----     ------                 ----               ----                       -------
+      Warning  FailedGetPodsMetric    10s (x6 over 85s)  horizontal-pod-autoscaler  unable to get metric packets-per-second: unable to fetch metrics from custom metrics API: no custom metrics API (custom.metrics.k8s.io) registered
+      Warning  FailedGetObjectMetric  10s (x6 over 85s)  horizontal-pod-autoscaler  unable to get metric requests-per-second: Ingress on zyx-hpa main-route/unable to fetch metrics from custom metrics API: no custom metrics API (custom.metrics.k8s.io) registered
 
 
