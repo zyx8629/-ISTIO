@@ -89,6 +89,8 @@
 
 ## 3、Localizing Failure Root Causes in a Microservice through Causality Inference
 
+思路：提出一个并行模型，MicoCause，目标是在微服务中定位故障根因的度量。模型有两个主要部分，一个基于改进的PC算法学习服务之间关系的因果图构造，另一个是面向时间序列的根本原因诊断的随机游走算法。
+
 * 几个概念
 
 1⃣️ KPI 和 metric
